@@ -1,8 +1,8 @@
 # 338-ride
 
 
-# Setup (with Northwestern Quest HPC)
-## If you have a Mac
+## Setup (with Northwestern Quest HPC)
+### If you have a Mac
 Install FastX3 at ____. Log in with your Northwestern <NUID>@quest.northwestern.edu, password.
 
 The default FastX3 hardware is not sufficient to run CARLA. To acquire an A100 GPU, run:
@@ -14,7 +14,7 @@ The result should be your allocation ID (e.g. eXXXXX). Then run:
 srun -A eXXXXX -p gengpu --mem=12G --gres=gpu:a100:1 -N 1 -n 1 -t <time> --pty bash -l
 ```
 
-# After getting Windows/Linux
+## After getting Windows/Linux
 Follow (instructions)[https://carla.readthedocs.io/en/latest/start_quickstart/#download-and-extract-a-carla-package] to install the most recent stable CARLA package.
 
 Make sure your Python version is acceptable (FastX3 has version 3.8), and create a virtual environment with that version: 
