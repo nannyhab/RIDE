@@ -3,7 +3,7 @@
 
 ## Setup (with Northwestern Quest HPC)
 ### If you have a Mac
-Install FastX3 at ____. Log in with your Northwestern <NUID>@quest.northwestern.edu, password.
+Install FastX3 at https://www.starnet.com/download/fastx-client. Log in with your Northwestern <NUID>@quest.northwestern.edu, password.
 
 The default FastX3 hardware is not sufficient to run CARLA. To acquire an A100 GPU, run:
 ```
