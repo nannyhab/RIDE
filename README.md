@@ -1,3 +1,15 @@
+To open Carla GUI
+
+1.) open terminal when in quest via FastX
+2.) cd /projects/p33058/carla
+3.) srun --x11 -A p33058 -p gengpu --gres=gpu:a100:1 --mem=16G -t 1:00:00 --pty bash -l
+4.) conda activate /projects/p33058/envs/carla-py39
+5.) ./CarlaUE4.sh
+
+
+
+
+
 # 338-ride
 
 
