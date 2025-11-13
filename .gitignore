@@ -1,0 +1,19 @@
+# Exclude CARLA installation (keep only your code)
+CarlaUE4/
+CARLA_0.9.15.tar.gz
+*.tar.gz
+
+# Large data
+HDMaps/
+Import/
+
+# Build files
+*.debug
+*.sym
+*.so
+*.a
+
+# Python
+__pycache__/
+*.pyc
+*.egg

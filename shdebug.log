@@ -1,0 +1,16 @@
++ '[' -z '' ']'
++ case "$-" in
++ __lmod_vx=x
++ '[' -n x ']'
++ set +x
+Shell debugging temporarily silenced: export LMOD_SH_DBG_ON=1 for this output (/hpc/software/spack_v20d1/spack/opt/spack/linux-rhel7-x86_64/gcc-4.8.5/lmod-8.7.24-ptfr7cudrme2v7y2nfktkkftnrgkezra/lmod/lmod/init/bash)
+Shell debugging restarted
++ unset __lmod_vx
+++ xargs readlink -f
+++ echo '"./CarlaUE4.sh"'
++ UE4_TRUE_SCRIPT_NAME=/gpfs/projects/p33058/carla/CarlaUE4.sh
+++ dirname /gpfs/projects/p33058/carla/CarlaUE4.sh
++ UE4_PROJECT_ROOT=/gpfs/projects/p33058/carla
++ chmod +x /gpfs/projects/p33058/carla/CarlaUE4/Binaries/Linux/CarlaUE4-Linux-Shipping
++ /gpfs/projects/p33058/carla/CarlaUE4/Binaries/Linux/CarlaUE4-Linux-Shipping CarlaUE4 -RenderOffScreen -quality-level=Low -log -stdout
+sh: xdg-user-dir: command not found
