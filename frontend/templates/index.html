@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Track Parameter Optimizer</title>
+</head>
+<body>
+  <h1>Track Parameter Optimizer</h1>
+
+  <label for="envSlider">
+    Environment (City ←→ Highway):
+  </label>
+  <input id="envSlider" type="range" min="0" max="100" value="50" />
+
+  <button id="optimizeBtn">Optimize Parameters</button>
+<span id="loading" style="display:none; margin-left:8px;">
+  Optimizing...
+</span>
+
+<h2>Recommended Settings</h2>
+<pre id="results">No results yet.</pre>
+
+<script>
+  const slider = document.getElementById("envSlider");
+  const button = document.getElementById("optimizeBtn");
+  const results = document.getElementById("results");
+  const loading = document.getElementById("loading");
+
+  button.addEventListener("click", async () => {
+    const envMix = slider.value / 100.0;
+
+    // UI: show loading state
+    button.disabled = true;
+    loading.style.display = "inline";
+    results.textContent = "Running optimization...";
+
+    try {
+      const resp = await fetch("/optimize", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ env_mix: envMix })
+      });
+
+      if (!resp.ok) {
+        throw new Error("Server error");
+      }
+
+      const data = await resp.json();
+      results.textContent = JSON.stringify(data, null, 2);
+    } catch (err) {
+      results.textContent = "Error running optimization.";
+      console.error(err);
+    } finally {
+      // UI: clear loading state
+      button.disabled = false;
+      loading.style.display = "none";
+    }
+  });
+</script>
+
+</body>
+</html>
