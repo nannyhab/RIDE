@@ -9,13 +9,14 @@ def index():
 
 @app.route("/optimize", methods=["POST"])
 def optimize():
-    data = request.get_json()
-    slider_value = data["env_mix"]   # 0.0 = city, 1.0 = highway
-    print(slider_value)
+    data = request.get_json() or {}
+    flags = data.get("environment_flags", {})
     # TODO: call your CARLA/ML parameter search here
     time.sleep(2)
     best_params = {
-        "slider value": slider_value,
+        "profile_summary": ", ".join(
+            k.replace("_", " ") for k, v in flags.items() if v
+        ) or "No specific features selected",
         "tire_friction": 1.2,
         "gear_ratio": 3.5,
         "predicted_time": 123.4,

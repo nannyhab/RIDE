@@ -2,61 +2,740 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>Track Parameter Optimizer</title>
+  <title>Digital Twin Environment-Aware Vehicle Parameter Optimization</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <style>
+    :root {
+      --bg: #020617;
+      --panel: #020617;
+      --panel-alt: #02091d;
+      --border: #1f2937;
+      --accent: #38bdf8;
+      --accent-soft: rgba(56, 189, 248, 0.2);
+      --text: #e5e7eb;
+      --muted: #9ca3af;
+      --danger: #f97373;
+      --radius-lg: 16px;
+      --radius-md: 10px;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
+        sans-serif;
+      background: #1e293b;
+      color: var(--text);
+      min-height: 100vh;
+    }
+
+    .page {
+      max-width: 1080px;
+      margin: 32px auto;
+      padding: 0 16px 40px;
+    }
+
+    .header {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      gap: 10px;
+      margin-bottom: 20px;
+    }
+
+    .title {
+      font-size: 26px;
+      font-weight: 650;
+      letter-spacing: 0.03em;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .pill {
+      font-size: 11px;
+      padding: 2px 8px;
+      border-radius: 999px;
+      border: 1px solid var(--accent-soft);
+      color: var(--accent);
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+    }
+
+    .subtitle {
+      font-size: 13px;
+      color: var(--muted);
+      max-width: 480px;
+      line-height: 1.4;
+    }
+
+    .layout {
+      display: grid;
+      grid-template-columns: minmax(0, 1.1fr) minmax(0, 1.1fr);
+      gap: 18px;
+      align-items: flex-start;
+    }
+
+    @media (max-width: 800px) {
+      .layout {
+        grid-template-columns: minmax(0, 1fr);
+      }
+    }
+
+    .card {
+      background: rgba(2, 6, 23, 0.96);
+      border-radius: var(--radius-lg);
+      border: 1px solid rgba(15, 23, 42, 0.9);
+      box-shadow: 0 18px 45px rgba(0, 0, 0, 0.55);
+      padding: 16px 16px 18px;
+      backdrop-filter: blur(12px);
+    }
+
+    .card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 10px;
+    }
+
+    .card-title {
+      font-size: 14px;
+      text-transform: uppercase;
+      letter-spacing: 0.09em;
+      color: var(--muted);
+    }
+
+    .badge {
+      font-size: 11px;
+      padding: 2px 8px;
+      border-radius: 999px;
+      border: 1px solid rgba(148, 163, 184, 0.3);
+      color: var(--muted);
+    }
+
+    .checkbox-group {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 8px;
+      margin-top: 6px;
+    }
+
+    .checkbox-row {
+      display: flex;
+      align-items: flex-start;
+      gap: 8px;
+      padding: 8px 9px;
+      border-radius: var(--radius-md);
+      border: 1px solid var(--border);
+      background: var(--panel);
+      cursor: pointer;
+      transition: border-color 0.15s ease, background 0.15s ease,
+        transform 0.1s ease;
+    }
+
+    .checkbox-row:hover {
+      border-color: #334155;
+      background: #02091d;
+      transform: translateY(-1px);
+    }
+
+    .checkbox-row input {
+      margin-top: 3px;
+    }
+
+    .checkbox-label-main {
+      font-size: 14px;
+      font-weight: 500;
+    }
+
+    .checkbox-label-sub {
+      font-size: 12px;
+      color: var(--muted);
+      line-height: 1.35;
+    }
+
+    .hint {
+      font-size: 11px;
+      color: var(--muted);
+      margin-top: 4px;
+    }
+
+    .button-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-top: 10px;
+    }
+
+    .btn-primary {
+      border: none;
+      border-radius: 999px;
+      padding: 8px 16px;
+      font-size: 13px;
+      font-weight: 500;
+      cursor: pointer;
+      background: #38bdf8;
+      color: #0f172a;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      box-shadow: none;
+      transition: opacity 0.15s ease;
+    }
+
+    .btn-primary:disabled {
+      opacity: 0.45;
+      cursor: default;
+      box-shadow: none;
+      transform: none;
+    }
+
+    .btn-primary:not(:disabled):hover {
+      transform: none;  
+      box-shadow: none;      
+      opacity: 0.9;
+    }
+
+    .spinner {
+      border: 2px solid rgba(15, 23, 42, 0.1);
+      border-top: 2px solid #0f172a;
+      border-right: 2px solid #0f172a;
+      border-radius: 50%;
+      width: 12px;
+      height: 12px;
+      animation: spin 0.6s linear infinite;
+    }
+
+    @keyframes spin {
+      0% { transform: rotate(0); }
+      100% { transform: rotate(360deg); }
+    }
+
+    .status-text {
+      font-size: 12px;
+      color: var(--muted);
+      margin-top: 4px;
+    }
+
+    .status-text.error {
+      color: var(--danger);
+    }
+
+    .details-body {
+      font-size: 13px;
+      color: var(--muted);
+      line-height: 1.4;
+    }
+
+    .details-body ul {
+      margin: 6px 0 0;
+      padding-left: 18px;
+    }
+
+    .details-body li {
+      margin-bottom: 2px;
+    }
+
+    .results-card {
+      margin-top: 16px;
+      display: grid;
+      grid-template-columns: minmax(0, 1.1fr) minmax(0, 1.1fr);
+      gap: 18px;
+    }
+
+    @media (max-width: 900px) {
+      .results-card {
+        grid-template-columns: minmax(0, 1fr);
+      }
+    }
+
+    .results-main {
+      border-radius: var(--radius-lg);
+      border: 1px solid var(--border);
+      padding: 14px 16px 16px;
+      background: radial-gradient(circle at top left, #0f172a, #020617);
+    }
+
+    .results-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 8px;
+    }
+
+    .results-title {
+      font-size: 14px;
+      font-weight: 600;
+    }
+
+    .pill-env {
+      font-size: 11px;
+      padding: 2px 8px;
+      border-radius: 999px;
+      background: rgba(56, 189, 248, 0.12);
+      color: var(--accent);
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+    }
+
+    .results-grid {
+      display: grid;
+      grid-template-columns: minmax(0, 1.2fr) minmax(0, 1.2fr);
+      gap: 12px;
+      margin-top: 8px;
+    }
+
+    @media (max-width: 600px) {
+      .results-grid {
+        grid-template-columns: minmax(0, 1fr);
+      }
+    }
+
+    .metric {
+      padding: 8px 10px;
+      border-radius: 10px;
+      border: 1px solid rgba(148, 163, 184, 0.2);
+      background: rgba(15, 23, 42, 0.85);
+    }
+
+    .metric-label {
+      font-size: 11px;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      margin-bottom: 2px;
+    }
+
+    .metric-value {
+      font-size: 15px;
+      font-weight: 600;
+    }
+
+    .metric-sub {
+      font-size: 11px;
+      color: var(--muted);
+      margin-top: 2px;
+    }
+
+    .metric-good { color: #4ade80; }
+    .metric-bad { color: var(--danger); }
+
+    .results-text {
+      font-size: 13px;
+      color: var(--muted);
+      margin-top: 8px;
+      line-height: 1.45;
+    }
+
+    .results-secondary {
+      border-radius: var(--radius-lg);
+      border: 1px dashed rgba(148, 163, 184, 0.35);
+      padding: 10px 14px 12px;
+      background: rgba(15, 23, 42, 0.7);
+      font-size: 12px;
+      color: var(--muted);
+      line-height: 1.4;
+    }
+
+    code {
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas,
+        "Liberation Mono", "Courier New", monospace;
+      font-size: 12px;
+      background: rgba(15, 23, 42, 0.8);
+      padding: 0 4px;
+      border-radius: 4px;
+    }
+  </style>
 </head>
 <body>
-  <h1>Track Parameter Optimizer</h1>
+  <div class="page">
+    <header class="header">
+      <div>
+        <div class="title">
+          Digital Twin–Based Environment-Aware Vehicle Parameter Optimization
+          
+        </div>
+        <p class="subtitle">
+          Select the characteristics of a representative route. We’ll suggest
+          tire friction and gear ratio settings that minimize travel time over
+          CARLA tracks matching those features.
+        </p>
+      </div>
+    </header>
 
-  <label for="envSlider">
-    Environment (City ←→ Highway):
-  </label>
-  <input id="envSlider" type="range" min="0" max="100" value="50" />
+    <div class="layout">
+      <!-- Left: checkboxes -->
+      <section class="card">
+        <div class="card-header">
+          <div class="card-title">1 · Select environment parameters</div>
+          
+        </div>
 
-  <button id="optimizeBtn">Optimize Parameters</button>
-<span id="loading" style="display:none; margin-left:8px;">
-  Optimizing...
-</span>
+        <div class="checkbox-group" id="checkboxGroup">
+          <!-- 90° turns -->
+          <label class="checkbox-row">
+            <input type="checkbox" id="featRightAngles" />
+            <div>
+              <div class="checkbox-label-main">90° intersections</div>
+              <div class="checkbox-label-sub">
+                Grid-like streets with frequent right-angle turns (typical
+                downtown driving).
+              </div>
+            </div>
+          </label>
 
-<h2>Recommended Settings</h2>
-<pre id="results">No results yet.</pre>
+          <!-- Stoplights -->
+          <label class="checkbox-row">
+            <input type="checkbox" id="featStoplights" />
+            <div>
+              <div class="checkbox-label-main">Stop-and-go driving</div>
+              <div class="checkbox-label-sub">
+                Many stop signs or traffic lights that cause repeated
+                stop-and-go acceleration.
+              </div>
+            </div>
+          </label>
 
-<script>
-  const slider = document.getElementById("envSlider");
-  const button = document.getElementById("optimizeBtn");
-  const results = document.getElementById("results");
-  const loading = document.getElementById("loading");
+          <!-- Steep elevation -->
+          <label class="checkbox-row">
+            <input type="checkbox" id="featSteepElevation" />
+            <div>
+              <div class="checkbox-label-main">Steep elevation changes</div>
+              <div class="checkbox-label-sub">
+                Hills or ramps where the road has noticeable slopes and
+                frequent ups/downs.
+              </div>
+            </div>
+          </label>
 
-  button.addEventListener("click", async () => {
-    const envMix = slider.value / 100.0;
+          <!-- High speed areas -->
+          <label class="checkbox-row">
+            <input type="checkbox" id="featHighSpeed" />
+            <div>
+              <div class="checkbox-label-main">High-speed sections</div>
+              <div class="checkbox-label-sub">
+                Portions of the route where the vehicle can maintain
+                highway-like speeds for a while.
+              </div>
+            </div>
+          </label>
 
-    // UI: show loading state
-    button.disabled = true;
-    loading.style.display = "inline";
-    results.textContent = "Running optimization...";
+          <!-- Tight curves -->
+          <label class="checkbox-row">
+            <input type="checkbox" id="featTightCurves" />
+            <div>
+              <div class="checkbox-label-main">Tight curves / S-bends</div>
+              <div class="checkbox-label-sub">
+                Curvy segments requiring frequent steering input and lateral
+                acceleration.
+              </div>
+            </div>
+          </label>
 
-    try {
-      const resp = await fetch("/optimize", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ env_mix: envMix })
+          <!-- Long straights -->
+          <label class="checkbox-row">
+            <input type="checkbox" id="featLongStraights" />
+            <div>
+              <div class="checkbox-label-main">Long straightaways</div>
+              <div class="checkbox-label-sub">
+                Extended straight sections where the car spends time at
+                roughly constant speed.
+              </div>
+            </div>
+          </label>
+
+          <!-- Narrow lanes -->
+          <label class="checkbox-row">
+            <input type="checkbox" id="featNarrowLanes" />
+            <div>
+              <div class="checkbox-label-main">Narrow lanes</div>
+              <div class="checkbox-label-sub">
+                Constrained lane widths (residential streets, older city
+                centers) with less room to maneuver.
+              </div>
+            </div>
+          </label>
+
+          <!-- Wide multi-lane roads -->
+          <label class="checkbox-row">
+            <input type="checkbox" id="featWideLanes" />
+            <div>
+              <div class="checkbox-label-main">Wide multi-lane roads</div>
+              <div class="checkbox-label-sub">
+                Wide lanes or multi-lane roads typical of modern arterials
+                or highways.
+              </div>
+            </div>
+          </label>
+        </div>
+
+      </section>
+
+      <!-- Right: explanation + button -->
+      <section class="card">
+        <div class="card-header">
+          <div class="card-title">2 · Run optimization</div>
+          
+        </div>
+
+        <div class="details-body">
+          Based on your selections, we:
+          <ul>
+            <li>Choose a bundle of CARLA tracks whose features match the checked parameters.</li>
+            <li>Encode those tracks using curvature, slope, lane width, and related statistics.</li>
+            <li>Evaluate a 2D grid of tire friction and gear ratio settings with a trained regression model.</li>
+            <li>Return the parameter pair with the lowest predicted travel time over the bundle.</li>
+          </ul>
+        </div>
+
+      <div class="button-row">
+        <button class="btn-primary" id="optimizeBtn" disabled>
+          <span id="btnContent">Run optimization</span>
+        </button>
+        <span class="hint">
+          Check at least one parameter to enable the optimizer.
+        </span>
+      </div>
+      <div class="status-text" id="statusText"></div>
+
+      <!-- 🔽 MOVE THIS HERE 🔽 -->
+      <section id="resultsSection" style="display:none; margin-top: 12px;">
+        <div class="results-main">
+          <div class="results-header">
+            <div class="results-title">Recommended vehicle parameters</div>
+            <span class="pill-env" id="resultsEnv">Custom profile</span>
+          </div>
+          <div class="results-grid">
+            <div class="metric">
+              <div class="metric-label">Tire friction coefficient</div>
+              <div class="metric-value" id="resFriction">–</div>
+              <div class="metric-sub">
+                Higher values increase grip but may raise energy usage.
+              </div>
+            </div>
+            <div class="metric">
+              <div class="metric-label">Gear ratio</div>
+              <div class="metric-value" id="resGear">–</div>
+              <div class="metric-sub">
+                Balances acceleration from low speed vs high-speed efficiency.
+              </div>
+            </div>
+            <div class="metric">
+              <div class="metric-label">Predicted travel time</div>
+              <div class="metric-value" id="resTime">–</div>
+              <div class="metric-sub">
+                Lower is better; estimated over matching tracks.
+              </div>
+            </div>
+            <div class="metric">
+              <div class="metric-label">Improvement vs. stock</div>
+              <div class="metric-value" id="resImprovement">–</div>
+              <div class="metric-sub" id="resImprovementSub">
+                Negative values indicate faster lap times than baseline.
+              </div>
+            </div>
+          </div>
+
+          <p class="results-text" id="resultsText">
+            These settings come from evaluating many candidate parameter pairs on
+            tracks whose features match the boxes you selected.
+          </p>
+        </div>
+      </section>
+      <!-- 🔼 END MOVED BLOCK 🔼 -->
+    </section>
+    </div>
+
+    <!-- Results -->
+    <section class="results-card" id="resultsSection" style="display:none;">
+      <div class="results-main">
+        <div class="results-header">
+          <div class="results-title">Recommended vehicle parameters</div>
+          <span class="pill-env" id="resultsEnv">Custom profile</span>
+        </div>
+        <div class="results-grid">
+          <div class="metric">
+            <div class="metric-label">Tire friction coefficient</div>
+            <div class="metric-value" id="resFriction">–</div>
+            <div class="metric-sub">
+              Higher values increase grip but may raise energy usage.
+            </div>
+          </div>
+          <div class="metric">
+            <div class="metric-label">Gear ratio</div>
+            <div class="metric-value" id="resGear">–</div>
+            <div class="metric-sub">
+              Balances acceleration from low speed vs high-speed efficiency.
+            </div>
+          </div>
+          <div class="metric">
+            <div class="metric-label">Predicted travel time</div>
+            <div class="metric-value" id="resTime">–</div>
+            <div class="metric-sub">
+              Lower is better; estimated over tracks matching your selections.
+            </div>
+          </div>
+          <div class="metric">
+            <div class="metric-label">Improvement vs. stock</div>
+            <div class="metric-value" id="resImprovement">–</div>
+            <div class="metric-sub" id="resImprovementSub">
+              Negative values indicate faster lap times than baseline.
+            </div>
+          </div>
+        </div>
+
+        <!-- <p class="results-text" id="resultsText">
+          Results will appear here once you run the optimization.
+        </p> -->
+      </div>
+
+      <!-- <div class="results-secondary">
+        <strong>How this UI talks to the optimizer</strong><br />
+        The frontend sends a JSON payload like:
+        <code>{"environment_flags": { "right_angle_turns": true, "stoplights": true, ... }}</code>
+        to <code>POST /optimize</code>. The backend uses these flags to choose or
+        construct CARLA tracks, run the regression-based parameter search, and
+        return the best tire friction and gear ratio settings.
+      </div> -->
+    </section>
+  </div>
+
+  <script>
+    const optimizeBtn = document.getElementById("optimizeBtn");
+    const btnContent = document.getElementById("btnContent");
+    const statusText = document.getElementById("statusText");
+    const resultsSection = document.getElementById("resultsSection");
+
+    const resFriction = document.getElementById("resFriction");
+    const resGear = document.getElementById("resGear");
+    const resTime = document.getElementById("resTime");
+    const resImprovement = document.getElementById("resImprovement");
+    const resImprovementSub = document.getElementById("resImprovementSub");
+    const resultsText = document.getElementById("resultsText");
+    const resultsEnv = document.getElementById("resultsEnv");
+
+    const checkboxIds = [
+      "featRightAngles",
+      "featStoplights",
+      "featSteepElevation",
+      "featHighSpeed",
+      "featTightCurves",
+      "featLongStraights",
+      "featNarrowLanes",
+      "featWideLanes",
+    ];
+
+    function anyChecked() {
+      return checkboxIds.some(id => {
+        const el = document.getElementById(id);
+        return el && el.checked;
       });
-
-      if (!resp.ok) {
-        throw new Error("Server error");
-      }
-
-      const data = await resp.json();
-      results.textContent = JSON.stringify(data, null, 2);
-    } catch (err) {
-      results.textContent = "Error running optimization.";
-      console.error(err);
-    } finally {
-      // UI: clear loading state
-      button.disabled = false;
-      loading.style.display = "none";
     }
-  });
-</script>
 
+    function updateButtonState() {
+      optimizeBtn.disabled = !anyChecked() || isLoading;
+    }
+
+    checkboxIds.forEach(id => {
+      const el = document.getElementById(id);
+      if (el) {
+        el.addEventListener("change", updateButtonState);
+      }
+    });
+
+    let isLoading = false;
+
+    function setLoading(loading) {
+      isLoading = loading;
+      updateButtonState();
+      statusText.textContent = loading
+        ? "Running optimization for the selected environment parameters..."
+        : "";
+      statusText.classList.toggle("error", false);
+
+      if (loading) {
+        btnContent.innerHTML =
+          '<span class="spinner"></span><span>Optimizing…</span>';
+      } else {
+        btnContent.textContent = "Run optimization";
+      }
+    }
+
+    optimizeBtn.addEventListener("click", async () => {
+      if (!anyChecked() || isLoading) return;
+
+      setLoading(true);
+      resultsSection.style.display = "none";
+
+      const flags = {
+        right_angle_turns: document.getElementById("featRightAngles").checked,
+        stoplights: document.getElementById("featStoplights").checked,
+        steep_elevation_changes: document.getElementById("featSteepElevation").checked,
+        high_speed_sections: document.getElementById("featHighSpeed").checked,
+        tight_curves: document.getElementById("featTightCurves").checked,
+        long_straights: document.getElementById("featLongStraights").checked,
+        narrow_lanes: document.getElementById("featNarrowLanes").checked,
+        wide_lanes: document.getElementById("featWideLanes").checked,
+      };
+
+      try {
+        const resp = await fetch("/optimize", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ environment_flags: flags }),
+        });
+
+        if (!resp.ok) {
+          throw new Error("Server error " + resp.status);
+        }
+
+        const data = await resp.json();
+
+        resFriction.textContent =
+          data.tire_friction != null ? data.tire_friction.toFixed(2) : "–";
+        resGear.textContent =
+          data.gear_ratio != null ? data.gear_ratio.toFixed(2) : "–";
+        resTime.textContent =
+          data.predicted_time != null ? data.predicted_time.toFixed(1) + " s" : "–";
+
+        if (typeof data.improvement_percent === "number") {
+          const val = data.improvement_percent;
+          const sign = val > 0 ? "+" : "";
+          resImprovement.textContent = `${sign}${val.toFixed(1)}%`;
+          const good = val < 0;
+          resImprovement.classList.toggle("metric-good", good);
+          resImprovement.classList.toggle("metric-bad", !good);
+          resImprovementSub.textContent = good
+            ? "The model predicts faster completion time than the baseline parameters."
+            : "The model predicts slower completion time than the baseline parameters.";
+        } else {
+          resImprovement.textContent = "–";
+          resImprovement.classList.remove("metric-good", "metric-bad");
+          resImprovementSub.textContent =
+            "Improvement vs. baseline was not provided.";
+        }
+
+        resultsEnv.textContent =
+          (data.profile_summary || "Custom profile").toUpperCase();
+
+        //resultsText.textContent =
+        //  "These settings come from evaluating many candidate parameter pairs on tracks whose geometric features (curvature, elevation, straights vs. corners) match the boxes you selected.";
+
+        resultsSection.style.display = "grid";
+        statusText.textContent = "Optimization complete.";
+      } catch (err) {
+        console.error(err);
+        statusText.textContent =
+          "Error running optimization. Check the backend logs.";
+        statusText.classList.add("error");
+      } finally {
+        setLoading(false);
+      }
+    });
+
+    // Initial button state
+    updateButtonState();
+  </script>
 </body>
 </html>
