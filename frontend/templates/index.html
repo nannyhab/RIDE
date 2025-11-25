@@ -385,18 +385,6 @@
             </div>
           </label>
 
-          <!-- Stoplights -->
-          <label class="checkbox-row">
-            <input type="checkbox" id="featStoplights" />
-            <div>
-              <div class="checkbox-label-main">Stop-and-go driving</div>
-              <div class="checkbox-label-sub">
-                Many stop signs or traffic lights that cause repeated
-                stop-and-go acceleration.
-              </div>
-            </div>
-          </label>
-
           <!-- Steep elevation -->
           <label class="checkbox-row">
             <input type="checkbox" id="featSteepElevation" />
@@ -617,7 +605,6 @@
 
     const checkboxIds = [
       "featRightAngles",
-      "featStoplights",
       "featSteepElevation",
       "featHighSpeed",
       "featTightCurves",
@@ -670,7 +657,6 @@
 
       const flags = {
         right_angle_turns: document.getElementById("featRightAngles").checked,
-        stoplights: document.getElementById("featStoplights").checked,
         steep_elevation_changes: document.getElementById("featSteepElevation").checked,
         high_speed_sections: document.getElementById("featHighSpeed").checked,
         tight_curves: document.getElementById("featTightCurves").checked,
@@ -722,7 +708,7 @@
         //resultsText.textContent =
         //  "These settings come from evaluating many candidate parameter pairs on tracks whose geometric features (curvature, elevation, straights vs. corners) match the boxes you selected.";
 
-        resultsSection.style.display = "grid";
+        resultsSection.style.display = "block";
         statusText.textContent = "Optimization complete.";
       } catch (err) {
         console.error(err);
