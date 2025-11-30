@@ -96,7 +96,7 @@ def demo_training(track_file, num_episodes=50):
     input("\nPress Enter to start training...")
     
     # Import and run training
-    from train_agent import train_agent
+    from PythonAPI.examples.RIDE.adnanWork.oldCODE.train_agent import train_agent
     
     try:
         train_agent(
