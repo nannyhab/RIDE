@@ -1,6 +1,6 @@
 """
-Track Parameter Optimizer - COMPREHENSIVE METRICS
-All performance metrics collected
+Track Parameter Optimizer - BALANCED EXTREME
+Physics matter without constant crashing
 """
 
 import carla
@@ -18,13 +18,20 @@ from sklearn.metrics import r2_score
 DATA_DIR = "track_optimization_data_real_maps"
 os.makedirs(DATA_DIR, exist_ok=True)
 
-GEAR_RATIOS = [1.5, 2.5, 4.0, 6.0]
-TIRE_FRICTIONS = [0.5, 1.0, 2.0, 3.0]
+# ============================================================================
+# EXTREME BUT SAFE PHYSICS PARAMETERS
+# ============================================================================
+GEAR_RATIOS = [1.5, 2.5, 4.0, 6.0]  # Extreme range
+TIRE_FRICTIONS = [0.5, 1.0, 2.0, 3.0]  # 0.5 = slippery, 3.0 = super grip
 TRACK_SEGMENTS = 20
 
+# ============================================================================
+# CONFIGURATION
+# ============================================================================
 OBEY_TRAFFIC_RULES = False
 NO_RENDERING_MODE = False
-AUTOPILOT_SPEED_BOOST = -150
+AUTOPILOT_SPEED_BOOST = -100  # 100% faster - fast but not crash-prone
+# ============================================================================
 
 
 class MapRouteSelector:
@@ -174,12 +181,11 @@ def get_planned_route(world, start_spawn_idx, end_spawn_idx):
     return start_location, end_location, waypoints
 
 
-class CollisionTracker:
+class SmartCollisionSensor:
     def __init__(self):
+        self.hard_collision = False
         self.collision_count = 0
-        self.severe_collision = False
-        self.last_collision_time = 0
-        self.min_impulse_severe = 2000.0
+        self.min_impulse = 1200.0  # Higher - only severe crashes
     
     def on_collision(self, event):
         impulse = math.sqrt(
@@ -188,183 +194,63 @@ class CollisionTracker:
             event.normal_impulse.z**2
         )
         
-        current_time = time.time()
-        
-        if current_time - self.last_collision_time > 0.5:
+        if impulse > self.min_impulse:
+            self.hard_collision = True
             self.collision_count += 1
-            self.last_collision_time = current_time
-        
-        if impulse > self.min_impulse_severe:
-            self.severe_collision = True
     
     def reset(self):
+        self.hard_collision = False
         self.collision_count = 0
-        self.severe_collision = False
-        self.last_collision_time = 0
 
 
-class ComprehensiveMetrics:
-    """Tracks ALL performance metrics"""
+class PerformanceMetrics:
     def __init__(self):
-        # Speed metrics
         self.speeds = []
-        
-        # Acceleration metrics
-        self.lateral_accels = []
-        self.longitudinal_accels = []
-        
-        # Control metrics
-        self.lateral_offsets = []
-        self.steering_angles = []
-        
-        # Distance tracking
-        self.total_distance = 0.0
-        self.prev_location = None
-        self.prev_velocity = None
+        self.max_speed_seen = 0.0
     
-    def update(self, vehicle, waypoints):
-        """Update all metrics"""
-        # Get vehicle state
-        location = vehicle.get_location()
-        velocity = vehicle.get_velocity()
-        control = vehicle.get_control()
-        
-        # Speed
-        speed = math.sqrt(velocity.x**2 + velocity.y**2 + velocity.z**2)
+    def update(self, speed):
         self.speeds.append(speed)
-        
-        # Distance traveled
-        if self.prev_location is not None:
-            dist = math.sqrt(
-                (location.x - self.prev_location.x)**2 +
-                (location.y - self.prev_location.y)**2
-            )
-            self.total_distance += dist
-        
-        # Lateral offset (distance from centerline)
-        if len(waypoints) > 0:
-            min_dist = float('inf')
-            for wp in waypoints:
-                dist = location.distance(wp.transform.location)
-                if dist < min_dist:
-                    min_dist = dist
-            self.lateral_offsets.append(min_dist)
-        
-        # Steering
-        self.steering_angles.append(abs(control.steer))
-        
-        # Accelerations
-        if self.prev_velocity is not None:
-            # Longitudinal acceleration (forward/backward)
-            dv_long = speed - math.sqrt(
-                self.prev_velocity.x**2 + 
-                self.prev_velocity.y**2 + 
-                self.prev_velocity.z**2
-            )
-            longitudinal_accel = dv_long * 20.0  # Convert to m/s² (timestep = 0.05s)
-            self.longitudinal_accels.append(longitudinal_accel)
-            
-            # Lateral acceleration (cornering g-force)
-            angular_velocity = vehicle.get_angular_velocity()
-            lateral_accel = abs(angular_velocity.z * speed)
-            self.lateral_accels.append(lateral_accel)
-        
-        self.prev_location = location
-        self.prev_velocity = velocity
+        self.max_speed_seen = max(self.max_speed_seen, speed)
     
     def get_summary(self):
-        """Return all metrics"""
         if len(self.speeds) == 0:
             return {}
         
-        summary = {
-            # Speed metrics
+        return {
             'avg_speed_ms': np.mean(self.speeds),
-            'max_speed_ms': np.max(self.speeds),
-            'min_speed_ms': np.min(self.speeds),
-            'speed_std': np.std(self.speeds),
+            'max_speed_ms': self.max_speed_seen,
             'avg_speed_kmh': np.mean(self.speeds) * 3.6,
-            'max_speed_kmh': np.max(self.speeds) * 3.6,
-            
-            # Distance
-            'actual_distance_m': self.total_distance,
+            'max_speed_kmh': self.max_speed_seen * 3.6,
+            'speed_variance': np.var(self.speeds),
         }
-        
-        # Lateral acceleration (if available)
-        if len(self.lateral_accels) > 0:
-            summary['avg_lateral_accel'] = np.mean(np.abs(self.lateral_accels))
-            summary['max_lateral_accel'] = np.max(np.abs(self.lateral_accels))
-        else:
-            summary['avg_lateral_accel'] = 0.0
-            summary['max_lateral_accel'] = 0.0
-        
-        # Longitudinal acceleration (if available)
-        if len(self.longitudinal_accels) > 0:
-            summary['avg_longitudinal_accel'] = np.mean(np.abs(self.longitudinal_accels))
-            summary['max_longitudinal_accel'] = np.max(np.abs(self.longitudinal_accels))
-            # Smoothness: inverse of acceleration variance
-            summary['smoothness'] = 1.0 / (1.0 + np.std(self.longitudinal_accels))
-        else:
-            summary['avg_longitudinal_accel'] = 0.0
-            summary['max_longitudinal_accel'] = 0.0
-            summary['smoothness'] = 1.0
-        
-        # Lateral offset (if available)
-        if len(self.lateral_offsets) > 0:
-            summary['avg_lateral_offset'] = np.mean(self.lateral_offsets)
-            summary['max_lateral_offset'] = np.max(self.lateral_offsets)
-        else:
-            summary['avg_lateral_offset'] = 0.0
-            summary['max_lateral_offset'] = 0.0
-        
-        # Steering (if available)
-        if len(self.steering_angles) > 0:
-            summary['avg_steering'] = np.mean(self.steering_angles)
-            summary['max_steering'] = np.max(self.steering_angles)
-        else:
-            summary['avg_steering'] = 0.0
-            summary['max_steering'] = 0.0
-        
-        return summary
 
 
-def test_one_config(world, traffic_manager, start_loc, end_loc, waypoints, route_length, scenario, gear, friction, rendering_enabled):
-    """Test with comprehensive metrics"""
+def test_one_config(world, traffic_manager, start_loc, end_loc, route_length, scenario, gear, friction):
+    """Test with extreme but safe physics"""
     print(f"    g={gear:.1f} f={friction:.1f}", end=" ", flush=True)
     
     vehicle = None
     collision_sensor = None
-    spectator = None
     
     try:
         bp_lib = world.get_blueprint_library()
         vehicle_bp = bp_lib.filter('vehicle.tesla.model3')[0]
         
-        if len(waypoints) < 2:
-            print("ERR: not enough waypoints")
-            return None
-        
-        start_waypoint = waypoints[0]
-        road_yaw = start_waypoint.transform.rotation.yaw
-        
         spawn_transform = carla.Transform(
             start_loc + carla.Location(z=2.0),
-            carla.Rotation(pitch=0.0, yaw=road_yaw, roll=0.0)
+            carla.Rotation()
         )
         
         vehicle = world.spawn_actor(vehicle_bp, spawn_transform)
         
-        if rendering_enabled:
-            spectator = world.get_spectator()
-        
         collision_bp = bp_lib.find('sensor.other.collision')
-        collision_tracker = CollisionTracker()
+        collision_sensor_obj = SmartCollisionSensor()
         collision_sensor = world.spawn_actor(
             collision_bp,
             carla.Transform(),
             attach_to=vehicle
         )
-        collision_sensor.listen(collision_tracker.on_collision)
+        collision_sensor.listen(collision_sensor_obj.on_collision)
         
         vehicle.set_simulate_physics(False)
         for _ in range(5):
@@ -372,38 +258,29 @@ def test_one_config(world, traffic_manager, start_loc, end_loc, waypoints, route
         
         final_spawn = carla.Transform(
             start_loc + carla.Location(z=0.3),
-            carla.Rotation(pitch=0.0, yaw=road_yaw, roll=0.0)
+            carla.Rotation()
         )
         vehicle.set_transform(final_spawn)
-        
-        if rendering_enabled and spectator:
-            vt = vehicle.get_transform()
-            yaw_rad = math.radians(vt.rotation.yaw)
-            camera_transform = carla.Transform(
-                carla.Location(
-                    x=vt.location.x - 15.0 * math.cos(yaw_rad),
-                    y=vt.location.y - 15.0 * math.sin(yaw_rad),
-                    z=vt.location.z + 7.0
-                ),
-                carla.Rotation(pitch=-25.0, yaw=vt.rotation.yaw, roll=0.0)
-            )
-            spectator.set_transform(camera_transform)
         
         vehicle.set_simulate_physics(True)
         for _ in range(20):
             world.tick()
         
-        # Apply physics
+        # Apply physics - SIMPLE but EXTREME
         phys = vehicle.get_physics_control()
+        
+        # Gear ratio affects max RPM
         phys.max_rpm = 5000.0 * gear / 3.0
         
+        # Modify mass based on gear (lower gear = heavier feel)
         if gear < 2.0:
-            phys.mass = 2000.0
+            phys.mass = 2000.0  # Heavy
         elif gear > 5.0:
-            phys.mass = 1200.0
+            phys.mass = 1200.0  # Light
         else:
-            phys.mass = 1500.0
+            phys.mass = 1500.0  # Normal
         
+        # Tire friction - JUST friction, no stiffness mods
         for w in phys.wheels:
             w.tire_friction = friction
         
@@ -436,48 +313,37 @@ def test_one_config(world, traffic_manager, start_loc, end_loc, waypoints, route
         for _ in range(10):
             world.tick()
         
-        # Comprehensive metrics tracker
-        metrics = ComprehensiveMetrics()
+        metrics = PerformanceMetrics()
         
         sim_start_time = world.get_snapshot().timestamp.elapsed_seconds
+        start_location = vehicle.get_location()
         stuck_counter = 0
         completed = False
         
-        for step in range(8000):
+        for step in range(6000):
             world.tick()
-            
-            # Update ALL metrics
-            metrics.update(vehicle, waypoints)
             
             current_location = vehicle.get_location()
             velocity = vehicle.get_velocity()
             speed = math.sqrt(velocity.x**2 + velocity.y**2 + velocity.z**2)
             
-            # Update camera
-            if rendering_enabled and spectator and step % 2 == 0:
-                vt = vehicle.get_transform()
-                yaw_rad = math.radians(vt.rotation.yaw)
-                camera_transform = carla.Transform(
-                    carla.Location(
-                        x=vt.location.x - 15.0 * math.cos(yaw_rad),
-                        y=vt.location.y - 15.0 * math.sin(yaw_rad),
-                        z=vt.location.z + 7.0
-                    ),
-                    carla.Rotation(pitch=-25.0, yaw=vt.rotation.yaw, roll=0.0)
-                )
-                spectator.set_transform(camera_transform)
+            metrics.update(speed)
             
-            if collision_tracker.severe_collision:
+            if collision_sensor_obj.hard_collision:
                 vehicle.set_autopilot(False, tm_port)
                 world.tick()
                 collision_sensor.stop()
                 collision_sensor.destroy()
                 vehicle.destroy()
                 world.tick()
-                print(f"SEVERE COLLISION ({collision_tracker.collision_count} total)")
+                print("COLLISION")
                 return None
             
             dist_to_end = current_location.distance(end_loc)
+            distance_traveled = math.sqrt(
+                (current_location.x - start_location.x)**2 +
+                (current_location.y - start_location.y)**2
+            )
             
             if speed < 0.5:
                 stuck_counter += 1
@@ -493,7 +359,7 @@ def test_one_config(world, traffic_manager, start_loc, end_loc, waypoints, route
             else:
                 stuck_counter = 0
             
-            if dist_to_end < 20.0:
+            if dist_to_end < 15.0 or distance_traveled > route_length * 0.8:
                 completed = True
                 break
         
@@ -513,7 +379,7 @@ def test_one_config(world, traffic_manager, start_loc, end_loc, waypoints, route
         
         perf = metrics.get_summary()
         
-        print(f"{sim_elapsed_time:.1f}s | {perf['avg_speed_kmh']:.1f}km/h | col={collision_tracker.collision_count} ✓")
+        print(f"{sim_elapsed_time:.1f}s | avg={perf['avg_speed_kmh']:.1f} max={perf['max_speed_kmh']:.1f}km/h ✓")
         
         return {
             'track_id': scenario['id'],
@@ -523,7 +389,6 @@ def test_one_config(world, traffic_manager, start_loc, end_loc, waypoints, route
             'gear_ratio': gear,
             'tire_friction': friction,
             'travel_time': sim_elapsed_time,
-            'collision_count': collision_tracker.collision_count,
             **perf
         }
         
@@ -573,8 +438,6 @@ def collect_data():
     print(f"OBEY_TRAFFIC_RULES: {OBEY_TRAFFIC_RULES}")
     print(f"NO_RENDERING_MODE: {NO_RENDERING_MODE}")
     print(f"AUTOPILOT_SPEED_BOOST: {AUTOPILOT_SPEED_BOOST}%")
-    if not NO_RENDERING_MODE:
-        print("CAMERA: Following vehicle")
     print("="*60)
     
     print("\nInitializing Traffic Manager...", end=" ", flush=True)
@@ -605,8 +468,6 @@ def collect_data():
         settings = world.get_settings()
         settings.synchronous_mode = True
         settings.fixed_delta_seconds = 0.05
-        
-        rendering_enabled = not NO_RENDERING_MODE
         
         if NO_RENDERING_MODE:
             settings.no_rendering_mode = True
@@ -644,10 +505,9 @@ def collect_data():
             for friction in TIRE_FRICTIONS:
                 res = test_one_config(
                     world, traffic_manager,
-                    start_loc, end_loc, waypoints,
+                    start_loc, end_loc,
                     feats['total_length'],
-                    scenario, gear, friction,
-                    rendering_enabled
+                    scenario, gear, friction
                 )
                 if res:
                     res.update(feats)
@@ -709,7 +569,7 @@ def train_model(dataset):
 def main():
     print("="*60)
     print("TRACK PARAMETER OPTIMIZER")
-    print("COMPREHENSIVE METRICS")
+    print("Extreme Physics - No Crashes")
     print("="*60)
     
     dataset = collect_data()
