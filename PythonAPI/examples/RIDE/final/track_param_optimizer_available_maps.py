@@ -1,8 +1,3 @@
-"""
-Track Parameter Optimizer - COMPREHENSIVE METRICS
-All performance metrics collected
-"""
-
 import carla
 import numpy as np
 import math
