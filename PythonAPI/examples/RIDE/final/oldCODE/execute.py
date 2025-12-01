@@ -5,8 +5,6 @@ import time
 import pickle
 import json
 import os
-import sys
-import argparse
 from sklearn.ensemble import RandomForestRegressor
 from sklearn.preprocessing import StandardScaler
 from sklearn.model_selection import train_test_split
@@ -22,151 +20,122 @@ TRACK_SEGMENTS = 20
 # ========================================
 # CONFIGURATION FLAGS
 # ========================================
-OBEY_TRAFFIC_RULES = False
-NO_RENDERING_MODE = True
-AUTOPILOT_SPEED_BOOST = -150
-
-PREVIEW_MODE = True
-
-# SHORT traffic light times for quick stop-and-go
-TRAFFIC_LIGHT_GREEN_TIME = 10  # Green: 3 seconds
-TRAFFIC_LIGHT_YELLOW_TIME = 1.0  # Yellow: 1 second  
-TRAFFIC_LIGHT_RED_TIME = 2.0     # Red: 2 seconds (short stops!)
+OBEY_TRAFFIC_RULES = False        # CHANGED: Will be overridden per scenario
+NO_RENDERING_MODE = False         # True = no graphics (faster), False = show graphics
+AUTOPILOT_SPEED_BOOST = -150      # Percentage faster than speed limit
+PREVIEW_MODE = True                # True = only test 1 config per scenario (quick debug)
+                                   # False = test all 16 configs (full data collection)
 # ========================================
-
-
-def configure_traffic_lights(world, green=None, yellow=None, red=None):
-    """
-    Configure all traffic lights for FAST cycling with SHORT reds.
-    Lights will cycle: Green -> Yellow -> Red -> Green (quickly!)
-    This creates stop-and-go behavior without long waits.
-    """
-    if green is None:
-        green = TRAFFIC_LIGHT_GREEN_TIME
-    if yellow is None:
-        yellow = TRAFFIC_LIGHT_YELLOW_TIME
-    if red is None:
-        red = TRAFFIC_LIGHT_RED_TIME
-    
-    lights = world.get_actors().filter('traffic.traffic_light')
-    
-    for light in lights:
-        # Set SHORT cycle times
-        light.set_green_time(green)
-        light.set_yellow_time(yellow)
-        light.set_red_time(red)
-        
-        # Set initial state to GREEN (but don't freeze - let it cycle!)
-        light.set_state(carla.TrafficLightState.Green)
-        # DO NOT freeze - let lights cycle naturally with short times
-    
-    world.tick()
-    
-    if len(lights) > 0:
-        print(f"    Configured {len(lights)} lights - FAST CYCLING (G:{green}s Y:{yellow}s R:{red}s) ✓")
 
 
 class MapRouteSelector:
     def __init__(self):
         self.scenarios = [
-            # ========================================
-            # SCENARIO 1: Urban Straight Road (Town01)
-            # ========================================
+            # TOWN01 - Small town
             {'id': 0, 'map': 'Town01', 'start_idx': 0, 'end_idx': 50, 
-             'type': 'urban_straight_road', 'complexity': 'easy',
+             'type': 'straight_cruise', 'complexity': 'easy',
+             'obey_traffic': False},  # Highway-like, ignore rules
+            # Simulates: Long straightaway, highway cruising
+            
+            {'id': 1, 'map': 'Town01', 'start_idx': 82, 'end_idx': 5, 
+             'type': 'stop_and_go_urban', 'complexity': 'medium',
+             'obey_traffic': True},  # STOPS at stop signs
+            # Simulates: City driving with ACTUAL stops at stop signs, intersections
+            
+            {'id': 2, 'map': 'Town01', 'start_idx': 120, 'end_idx': 30, 
+             'type': 'tight_corners', 'complexity': 'medium',
              'obey_traffic': False},
-            # Tests: Straight-line speed, acceleration
-            # Terrain: Urban, flat (0.2m elevation)
+            # Simulates: Multiple tight 90-degree turns, residential maneuvering
             
-            # ========================================
-            # SCENARIO 2: Traffic Light STOP-AND-GO (Town01)
-            # ========================================
-            {'id': 1, 'map': 'Town01', 'start_idx': 15, 'end_idx': 75, 
-             'type': 'traffic_light_stop_go', 'complexity': 'medium',
-             'obey_traffic': True, 'obey_lights': True},
-            # Tests: STOP-AND-GO at traffic lights (fast cycling: 2s red!)
-            # Terrain: Urban grid
-            
-            # ========================================
-            # SCENARIO 3: Residential S-Curves (Town02)
-            # ========================================
-            {'id': 2, 'map': 'Town02', 'start_idx': 30, 'end_idx': 70, 
-             'type': 'residential_S_curves', 'complexity': 'medium',
+            # TOWN02 - Residential with stop signs
+            {'id': 3, 'map': 'Town02', 'start_idx': 5, 'end_idx': 65, 
+             'type': 'gentle_curves', 'complexity': 'easy',
              'obey_traffic': False},
-            # Tests: CONTINUOUS S-CURVES, smooth cornering
-            # Terrain: Residential winding roads, flat (0.0m elevation)
+            # Simulates: Gentle suburban curves, moderate speeds
             
-            # ========================================
-            # SCENARIO 4: Highway ELEVATION (Town04 - 11.4m!)
-            # ========================================
-            {'id': 3, 'map': 'Town04', 'start_idx': 0, 'end_idx': 200, 
-             'type': 'highway_ELEVATION_11m', 'complexity': 'medium',
+            {'id': 4, 'map': 'Town02', 'start_idx': 40, 'end_idx': 10, 
+             'type': 'stop_sign_navigation', 'complexity': 'medium',
+             'obey_traffic': True},  # STOPS at stop signs
+            # Simulates: Multiple stop signs, start-stop behavior
+            
+            {'id': 5, 'map': 'Town02', 'start_idx': 55, 'end_idx': 15, 
+             'type': 'winding_roads', 'complexity': 'medium',
              'obey_traffic': False},
-            # Tests: MAXIMUM ELEVATION (11.4m!), uphill/downhill at speed, gear ratio impact
-            # Terrain: Highway with HILLS and SLOPES - BEST ELEVATION!
+            # Simulates: Continuous S-curves, smooth steering required
             
-            # ========================================
-            # SCENARIO 5: Urban Elevation Roads (Town03 - 8.3m)
-            # ========================================
-            {'id': 4, 'map': 'Town03', 'start_idx': 10, 'end_idx': 180, 
-             'type': 'urban_elevation_8m', 'complexity': 'medium',
+            # TOWN03 - Large city with roundabouts
+            {'id': 6, 'map': 'Town03', 'start_idx': 0, 'end_idx': 80, 
+             'type': 'highway_straight', 'complexity': 'easy',
              'obey_traffic': False},
-            # Tests: Urban elevation changes (8.3m), mixed driving with hills
-            # Terrain: Urban area with SECOND-BEST elevation
+            # Simulates: Highway straight, high-speed stability
             
-            # ========================================
-            # SCENARIO 6: Urban STOP SIGNS (Town03)
-            # ========================================
-            {'id': 5, 'map': 'Town03', 'start_idx': 50, 'end_idx': 130, 
-             'type': 'urban_stop_signs', 'complexity': 'hard',
-             'obey_traffic': True, 'obey_signs': True},
-            # Tests: STOP SIGN stops (22 signs)
-            # Terrain: Urban intersections with elevation (8.3m)
-            
-            # ========================================
-            # SCENARIO 7: Large Sweeping Curves (Town03)
-            # ========================================
-            {'id': 6, 'map': 'Town03', 'start_idx': 100, 'end_idx': 20, 
-             'type': 'large_sweeping_curves', 'complexity': 'hard',
+            {'id': 7, 'map': 'Town03', 'start_idx': 100, 'end_idx': 20, 
+             'type': 'downtown_turns', 'complexity': 'medium',
              'obey_traffic': False},
-            # Tests: Fast sweeping turns, sustained lateral forces
-            # Terrain: Large roads with curves and elevation (8.3m)
+            # Simulates: Urban grid navigation, multiple turns
             
-            # ========================================
-            # SCENARIO 8: MAXIMUM STOP SIGNS (Town05 - 34 signs!)
-            # ========================================
-            {'id': 7, 'map': 'Town05', 'start_idx': 0, 'end_idx': 100, 
-             'type': 'maximum_stop_signs', 'complexity': 'hard',
-             'obey_traffic': True, 'obey_signs': True},
-            # Tests: EXTREME stop-and-go (34 stop signs!)
-            # Terrain: Dense urban grid, flat (0.4m)
-            
-            # ========================================
-            # SCENARIO 9: Wide Boulevard Curves (Town05)
-            # ========================================
-            {'id': 8, 'map': 'Town05', 'start_idx': 145, 'end_idx': 25, 
-             'type': 'wide_boulevard_curves', 'complexity': 'medium',
+            {'id': 8, 'map': 'Town03', 'start_idx': 123, 'end_idx': 55, 
+             'type': 'roundabout_actual', 'complexity': 'hard',
              'obey_traffic': False},
-            # Tests: Gentle high-speed curves
-            # Terrain: Wide boulevard, flat
+            # Simulates: FORCES through roundabout, circular navigation
             
-            # ========================================
-            # SCENARIO 10: Urban Grid 90° Turns (Town05)
-            # ========================================
-            {'id': 9, 'map': 'Town05', 'start_idx': 100, 'end_idx': 200, 
-             'type': 'urban_grid_90_turns', 'complexity': 'medium',
+            # TOWN04 - Highway with actual ramps
+            {'id': 9, 'map': 'Town04', 'start_idx': 0, 'end_idx': 60, 
+             'type': 'highway_cruise', 'complexity': 'easy',
              'obey_traffic': False},
-            # Tests: SHARP 90° turns, grid navigation
-            # Terrain: City grid, flat
+            # Simulates: Multi-lane highway, high-speed cruising
             
-            # ========================================
-            # SCENARIO 11: Narrow Streets + STOP SIGNS (Town10HD)
-            # ========================================
-            {'id': 10, 'map': 'Town10HD', 'start_idx': 50, 'end_idx': 130, 
-             'type': 'narrow_streets_stop_signs', 'complexity': 'hard',
-             'obey_traffic': True, 'obey_signs': True},
-            # Tests: Tight spaces + STOP SIGNS
-            # Terrain: Narrow urban streets, flat (0.3m)
+            {'id': 10, 'map': 'Town04', 'start_idx': 103, 'end_idx': 263, 
+             'type': 'highway_on_ramp_actual', 'complexity': 'medium',
+             'obey_traffic': False},
+            # Simulates: ACTUAL on-ramp merge from local to highway
+            
+            {'id': 11, 'map': 'Town04', 'start_idx': 272, 'end_idx': 100, 
+             'type': 'highway_off_ramp_actual', 'complexity': 'medium',
+             'obey_traffic': False},
+            # Simulates: ACTUAL off-ramp exit from highway to local
+            
+            # TOWN05 - Complex urban
+            {'id': 12, 'map': 'Town05', 'start_idx': 50, 'end_idx': 150, 
+             'type': 'dense_city_grid', 'complexity': 'easy',
+             'obey_traffic': False},
+            # Simulates: Urban grid with multiple intersections
+            
+            {'id': 13, 'map': 'Town05', 'start_idx': 100, 'end_idx': 200, 
+             'type': 'boulevard_with_turns', 'complexity': 'medium',
+             'obey_traffic': False},
+            # Simulates: Wide roads with sweeping turns
+            
+            {'id': 14, 'map': 'Town05', 'start_idx': 145, 'end_idx': 25, 
+             'type': 'stop_go_downtown', 'complexity': 'hard',
+             'obey_traffic': True},  # STOPS at stop signs
+            # Simulates: Downtown with ACTUAL stop-and-go at stop signs
+            
+            # TOWN10HD - Modern city
+            {'id': 15, 'map': 'Town10HD', 'start_idx': 20, 'end_idx': 100, 
+             'type': 'main_avenue', 'complexity': 'medium',
+             'obey_traffic': False},
+            # Simulates: Main city avenue, moderate traffic
+            
+            {'id': 16, 'map': 'Town10HD', 'start_idx': 50, 'end_idx': 130, 
+             'type': 'complex_intersections', 'complexity': 'hard',
+             'obey_traffic': False},
+            # Simulates: Multi-way intersections, complex navigation
+            
+            {'id': 17, 'map': 'Town10HD', 'start_idx': 75, 'end_idx': 155, 
+             'type': 'narrow_streets', 'complexity': 'hard',
+             'obey_traffic': False},
+            # Simulates: Narrow streets, tight clearances
+            
+            {'id': 18, 'map': 'Town10HD', 'start_idx': 90, 'end_idx': 10, 
+             'type': 'stop_sign_heavy', 'complexity': 'hard',
+             'obey_traffic': True},  # STOPS at stop signs
+            # Simulates: Area with MANY stop signs, heavy stop-and-go
+            
+            {'id': 19, 'map': 'Town10HD', 'start_idx': 110, 'end_idx': 190, 
+             'type': 'mixed_conditions', 'complexity': 'hard',
+             'obey_traffic': False},
+            # Simulates: Mixed: straights, turns, intersections
         ]
     
     def get_scenario(self, track_id):
@@ -331,8 +300,8 @@ class ComprehensiveMetrics:
         self.total_distance = 0.0
         self.prev_location = None
         self.prev_velocity = None
-        self.stop_count = 0
-        self.stopped_frames = 0
+        self.stop_count = 0  # Track number of stops
+        self.stopped_frames = 0  # Track how long stopped
     
     def update(self, vehicle, waypoints):
         location = vehicle.get_location()
@@ -342,9 +311,10 @@ class ComprehensiveMetrics:
         speed = math.sqrt(velocity.x**2 + velocity.y**2 + velocity.z**2)
         self.speeds.append(speed)
         
+        # Count stops (speed < 0.5 m/s for more than 10 frames)
         if speed < 0.5:
             self.stopped_frames += 1
-            if self.stopped_frames == 10:
+            if self.stopped_frames == 10:  # Just started stopping
                 self.stop_count += 1
         else:
             self.stopped_frames = 0
@@ -394,7 +364,7 @@ class ComprehensiveMetrics:
             'avg_speed_kmh': np.mean(self.speeds) * 3.6,
             'max_speed_kmh': np.max(self.speeds) * 3.6,
             'actual_distance_m': self.total_distance,
-            'stop_count': self.stop_count,
+            'stop_count': self.stop_count,  # NEW: number of stops
         }
         
         if len(self.lateral_accels) > 0:
@@ -517,17 +487,20 @@ def test_one_config(world, traffic_manager, start_loc, end_loc, waypoints, route
         vehicle.set_autopilot(True, tm_port)
         traffic_manager.set_path(vehicle, [end_loc])
         
+        # ========================================
+        # USE SCENARIO-SPECIFIC TRAFFIC RULES
+        # ========================================
         obey_traffic = scenario.get('obey_traffic', False)
-        obey_signs = scenario.get('obey_signs', False)
-        obey_lights = scenario.get('obey_lights', False)
         
         if obey_traffic:
-            traffic_manager.ignore_signs_percentage(vehicle, 0 if obey_signs else 100)
-            traffic_manager.ignore_lights_percentage(vehicle, 0 if obey_lights else 100)
+            # OBEY stop signs, ignore lights (too variable)
+            traffic_manager.ignore_lights_percentage(vehicle, 100)  # Ignore lights
+            traffic_manager.ignore_signs_percentage(vehicle, 0)     # OBEY stop signs
             traffic_manager.ignore_vehicles_percentage(vehicle, 100)
             traffic_manager.ignore_walkers_percentage(vehicle, 100)
-            traffic_manager.vehicle_percentage_speed_difference(vehicle, 0)
+            traffic_manager.vehicle_percentage_speed_difference(vehicle, 0)  # Follow speed limits
         else:
+            # Ignore everything, go fast
             traffic_manager.ignore_lights_percentage(vehicle, 100)
             traffic_manager.ignore_signs_percentage(vehicle, 100)
             traffic_manager.ignore_vehicles_percentage(vehicle, 100)
@@ -582,7 +555,8 @@ def test_one_config(world, traffic_manager, start_loc, end_loc, waypoints, route
             
             if speed < 0.5:
                 stuck_counter += 1
-                timeout_threshold = 1000 if obey_traffic else 400
+                # Higher timeout for stop-sign scenarios
+                timeout_threshold = 800 if obey_traffic else 400
                 if stuck_counter > timeout_threshold:
                     vehicle.set_autopilot(False, tm_port)
                     world.tick()
@@ -624,9 +598,7 @@ def test_one_config(world, traffic_manager, start_loc, end_loc, waypoints, route
             'map_name': scenario['map'],
             'route_type': scenario['type'],
             'complexity': scenario['complexity'],
-            'obey_traffic': obey_traffic,
-            'obey_signs': obey_signs,
-            'obey_lights': obey_lights,
+            'obey_traffic': obey_traffic,  # NEW: track if scenario obeyed traffic
             'gear_ratio': gear,
             'tire_friction': friction,
             'travel_time': sim_elapsed_time,
@@ -657,8 +629,7 @@ def test_one_config(world, traffic_manager, start_loc, end_loc, waypoints, route
         return None
 
 
-def collect_data(scenarios_to_run=None, preview_mode=True):
-    """Collect data for specified scenarios"""
+def collect_data():
     ckpt = f'{DATA_DIR}/dataset_checkpoint.pkl'
     
     if os.path.exists(ckpt):
@@ -673,24 +644,15 @@ def collect_data(scenarios_to_run=None, preview_mode=True):
     client = carla.Client('localhost', 2000)
     client.set_timeout(30.0)
     
-    selector = MapRouteSelector()
-    total_scenarios = selector.get_total_scenarios()
-    
-    if scenarios_to_run is None:
-        scenarios_to_run = list(range(total_scenarios))
-    
     print("\n" + "="*60)
     print("CONFIGURATION")
     print("="*60)
-    print(f"Scenarios to run: {scenarios_to_run}")
-    print(f"Total scenarios: {total_scenarios}")
     print(f"Gear Ratios: {GEAR_RATIOS}")
     print(f"Tire Frictions: {TIRE_FRICTIONS}")
-    print(f"Total data points: {len(scenarios_to_run)} scenarios × {'1' if preview_mode else '16'} configs = {len(scenarios_to_run) * (1 if preview_mode else 16)} points")
     print(f"NO_RENDERING_MODE: {NO_RENDERING_MODE}")
     print(f"AUTOPILOT_SPEED_BOOST: {AUTOPILOT_SPEED_BOOST}%")
-    print(f"PREVIEW_MODE: {preview_mode}")
-    print(f"Traffic Lights: FAST CYCLING (G:{TRAFFIC_LIGHT_GREEN_TIME}s Y:{TRAFFIC_LIGHT_YELLOW_TIME}s R:{TRAFFIC_LIGHT_RED_TIME}s)")
+    print(f"PREVIEW_MODE: {PREVIEW_MODE} {'(1 config per scenario)' if PREVIEW_MODE else '(all 16 configs)'}")
+    print("Traffic Rules: Per-scenario (some obey stop signs)")
     if not NO_RENDERING_MODE:
         print("CAMERA: Following vehicle")
     print("="*60)
@@ -701,34 +663,25 @@ def collect_data(scenarios_to_run=None, preview_mode=True):
     traffic_manager.set_global_distance_to_leading_vehicle(0.0)
     print("done\n")
     
+    selector = MapRouteSelector()
+    
     print("="*60)
     print("COLLECTING DATA")
     print("="*60)
     
-    for tid in scenarios_to_run:
-        if tid >= total_scenarios:
-            print(f"\n⚠️  Scenario {tid} doesn't exist (max is {total_scenarios-1})")
-            continue
-            
+    for tid in range(selector.get_total_scenarios()):
         if tid in done:
-            print(f"\nScenario {tid+1}/{total_scenarios} SKIP (already done)")
+            print(f"\nScenario {tid+1}/{selector.get_total_scenarios()} SKIP")
             continue
         
         scenario = selector.get_scenario(tid)
         
-        obey_str = ""
-        if scenario.get('obey_signs', False):
-            obey_str = " [OBEYS STOP SIGNS 🛑]"
-        elif scenario.get('obey_lights', False):
-            obey_str = " [STOP-AND-GO TRAFFIC LIGHTS 🚦]"
-        
-        print(f"\nScenario {tid+1}/{total_scenarios}: {scenario['map']} - {scenario['type']}{obey_str}")
+        obey_str = " [OBEYS STOP SIGNS]" if scenario.get('obey_traffic', False) else ""
+        print(f"\nScenario {tid+1}/{selector.get_total_scenarios()}: {scenario['map']} - {scenario['type']}{obey_str}")
         
         print(f"  Loading {scenario['map']}...", end=" ", flush=True)
         world = client.load_world(scenario['map'])
         print("done")
-        
-        configure_traffic_lights(world)
         
         settings = world.get_settings()
         settings.synchronous_mode = True
@@ -765,9 +718,9 @@ def collect_data(scenarios_to_run=None, preview_mode=True):
             print("  ERROR: no features")
             continue
         
-        print(f"  {feats['total_length']:.0f}m, curves={feats['tight_corners_pct']*100:.0f}%, max_slope={feats['max_slope']:.4f}")
+        print(f"  {feats['total_length']:.0f}m, {feats['tight_corners_pct']*100:.0f}% curves")
         
-        if preview_mode:
+        if PREVIEW_MODE:
             print("  [PREVIEW MODE: Testing 1 config only]")
             gear = 2.5
             friction = 1.0
@@ -785,7 +738,7 @@ def collect_data(scenarios_to_run=None, preview_mode=True):
                 dataset.append(res)
                 print(f"  ✓ Preview complete ({len(dataset)} total)")
             else:
-                print(f"  ✗ Preview failed")
+                print(f"  ✗ Preview failed - fix this scenario!")
             
         else:
             results = []
@@ -822,11 +775,11 @@ def train_model(dataset):
     print("TRAINING")
     print("="*60)
     
-    if len(dataset) < 10:
-        print("Not enough data for training (need at least 10 points)")
+    if PREVIEW_MODE:
+        print("PREVIEW MODE: Skipping model training (need full dataset)")
         return None, None, None
     
-    exclude = {'track_id', 'map_name', 'route_type', 'complexity', 'travel_time', 'obey_traffic', 'obey_signs', 'obey_lights'}
+    exclude = {'track_id', 'map_name', 'route_type', 'complexity', 'travel_time', 'obey_traffic'}
     feat_names = [k for k in dataset[0].keys() if k not in exclude]
     
     X = np.array([[d[k] for k in feat_names] for d in dataset])
@@ -859,116 +812,26 @@ def train_model(dataset):
     return model, scaler, feat_names
 
 
-def parse_arguments():
-    """Parse command line arguments"""
-    parser = argparse.ArgumentParser(
-        description='Track Parameter Optimizer for CARLA',
-        formatter_class=argparse.RawDescriptionHelpFormatter,
-        epilog="""
-Examples:
-  python3 track_param_optimizer_available_maps.py
-  python3 track_param_optimizer_available_maps.py --scenario 1 --render
-  python3 track_param_optimizer_available_maps.py --scenarios 1,3,5
-  python3 track_param_optimizer_available_maps.py --list
-        """
-    )
-    
-    parser.add_argument('--scenario', type=int, metavar='N',
-                       help='Run only scenario N (0-10)')
-    parser.add_argument('--scenarios', type=str, metavar='N,M,...',
-                       help='Run multiple scenarios (comma-separated)')
-    parser.add_argument('--preview', action='store_true',
-                       help='Preview mode: 1 config per scenario (default)')
-    parser.add_argument('--full', action='store_true',
-                       help='Full mode: 16 configs per scenario')
-    parser.add_argument('--render', action='store_true',
-                       help='Enable rendering (show graphics)')
-    parser.add_argument('--list', action='store_true',
-                       help='List all scenarios and exit')
-    
-    return parser.parse_args()
-
-
-def list_scenarios():
-    """List all available scenarios"""
-    selector = MapRouteSelector()
-    
-    print("="*60)
-    print("AVAILABLE SCENARIOS (11 total)")
-    print("="*60)
-    print(f"{'#':>2} | {'Map':10} | {'Type':35} | {'Features'}")
-    print("-"*60)
-    
-    for i in range(selector.get_total_scenarios()):
-        scenario = selector.get_scenario(i)
-        markers = ""
-        if scenario.get('obey_signs'):
-            markers += "🛑 "
-        if scenario.get('obey_lights'):
-            markers += "🚦 "
-        if 'S_curves' in scenario['type'] or 'curves' in scenario['type']:
-            markers += "🌀 "
-        if 'ELEVATION' in scenario['type'] or 'elevation' in scenario['type']:
-            markers += "⛰️  "
-        
-        print(f"{i:2d} | {scenario['map']:10} | {scenario['type']:35} | {markers}")
-    
-    print("\n🌀 = S-curves/winding roads")
-    print("⛰️  = ELEVATION (Town04=11.4m, Town03=8.3m)")
-    print("🛑 = Obeys STOP signs")
-    print("🚦 = Traffic lights (fast cycling - 2s red!)")
-
-
 def main():
-    args = parse_arguments()
-    
-    if args.list:
-        list_scenarios()
-        return
-    
-    scenarios_to_run = None
-    
-    if args.scenario is not None:
-        scenarios_to_run = [args.scenario]
-        print(f"Running ONLY scenario {args.scenario}")
-    elif args.scenarios is not None:
-        try:
-            scenarios_to_run = [int(s.strip()) for s in args.scenarios.split(',')]
-            print(f"Running scenarios: {scenarios_to_run}")
-        except ValueError:
-            print("ERROR: --scenarios must be comma-separated numbers")
-            return
-    
-    preview_mode = not args.full
-    
-    global NO_RENDERING_MODE
-    if args.render:
-        NO_RENDERING_MODE = False
-        print("Rendering ENABLED")
-    
     print("="*60)
     print("TRACK PARAMETER OPTIMIZER")
-    print("11 DIVERSE SCENARIOS")
-    print("Elevation: Town04 (11.4m) + Town03 (8.3m)")
-    print("Traffic Lights: FAST CYCLING (2s red for quick stops)")
-    if preview_mode:
-        print("MODE: Preview (1 config per scenario)")
+    if PREVIEW_MODE:
+        print("MODE: Preview (1 config per scenario for debugging)")
     else:
         print("MODE: Full Collection (16 configs per scenario)")
     print("="*60)
     
-    dataset = collect_data(scenarios_to_run, preview_mode)
+    dataset = collect_data()
     
     if len(dataset) < 10:
-        print("\n⚠️  Not enough data for model training")
+        print("ERROR: not enough data")
         return
     
-    if not preview_mode or len(dataset) >= 50:
-        train_model(dataset)
-    else:
-        print("\nSkipping model training (preview mode with limited data)")
+    train_model(dataset)
     
     print("\n✓ DONE")
+    if PREVIEW_MODE:
+        print("\nTo collect full dataset, set PREVIEW_MODE = False")
 
 
 if __name__ == "__main__":

@@ -23,23 +23,19 @@ TRACK_SEGMENTS = 20
 # CONFIGURATION FLAGS
 # ========================================
 OBEY_TRAFFIC_RULES = False
-NO_RENDERING_MODE = True
+NO_RENDERING_MODE = False
 AUTOPILOT_SPEED_BOOST = -150
-
 PREVIEW_MODE = True
-
-# SHORT traffic light times for quick stop-and-go
-TRAFFIC_LIGHT_GREEN_TIME = 10  # Green: 3 seconds
-TRAFFIC_LIGHT_YELLOW_TIME = 1.0  # Yellow: 1 second  
-TRAFFIC_LIGHT_RED_TIME = 2.0     # Red: 2 seconds (short stops!)
+TRAFFIC_LIGHT_GREEN_TIME = 1.5
+TRAFFIC_LIGHT_YELLOW_TIME = 0.5
+TRAFFIC_LIGHT_RED_TIME = 1.5
 # ========================================
 
 
 def configure_traffic_lights(world, green=None, yellow=None, red=None):
     """
-    Configure all traffic lights for FAST cycling with SHORT reds.
-    Lights will cycle: Green -> Yellow -> Red -> Green (quickly!)
-    This creates stop-and-go behavior without long waits.
+    Configure all traffic lights - FREEZE them in GREEN state.
+    This eliminates ALL red light waits for faster data collection.
     """
     if green is None:
         green = TRAFFIC_LIGHT_GREEN_TIME
@@ -51,19 +47,16 @@ def configure_traffic_lights(world, green=None, yellow=None, red=None):
     lights = world.get_actors().filter('traffic.traffic_light')
     
     for light in lights:
-        # Set SHORT cycle times
         light.set_green_time(green)
         light.set_yellow_time(yellow)
         light.set_red_time(red)
-        
-        # Set initial state to GREEN (but don't freeze - let it cycle!)
         light.set_state(carla.TrafficLightState.Green)
-        # DO NOT freeze - let lights cycle naturally with short times
+        light.freeze(True)  # FREEZE in green - no more red lights!
     
     world.tick()
     
     if len(lights) > 0:
-        print(f"    Configured {len(lights)} lights - FAST CYCLING (G:{green}s Y:{yellow}s R:{red}s) ✓")
+        print(f"    Configured {len(lights)} lights - FROZEN GREEN ✓")
 
 
 class MapRouteSelector:
@@ -79,13 +72,13 @@ class MapRouteSelector:
             # Terrain: Urban, flat (0.2m elevation)
             
             # ========================================
-            # SCENARIO 2: Traffic Light STOP-AND-GO (Town01)
+            # SCENARIO 2: Traffic Light Intersections (Town01)
             # ========================================
             {'id': 1, 'map': 'Town01', 'start_idx': 15, 'end_idx': 75, 
-             'type': 'traffic_light_stop_go', 'complexity': 'medium',
+             'type': 'traffic_light_intersections', 'complexity': 'medium',
              'obey_traffic': True, 'obey_lights': True},
-            # Tests: STOP-AND-GO at traffic lights (fast cycling: 2s red!)
-            # Terrain: Urban grid
+            # Tests: Intersections (lights frozen green - no stops!)
+            # Terrain: Urban grid, flat
             
             # ========================================
             # SCENARIO 3: Residential S-Curves (Town02)
@@ -690,7 +683,7 @@ def collect_data(scenarios_to_run=None, preview_mode=True):
     print(f"NO_RENDERING_MODE: {NO_RENDERING_MODE}")
     print(f"AUTOPILOT_SPEED_BOOST: {AUTOPILOT_SPEED_BOOST}%")
     print(f"PREVIEW_MODE: {preview_mode}")
-    print(f"Traffic Lights: FAST CYCLING (G:{TRAFFIC_LIGHT_GREEN_TIME}s Y:{TRAFFIC_LIGHT_YELLOW_TIME}s R:{TRAFFIC_LIGHT_RED_TIME}s)")
+    print(f"Traffic Lights: FROZEN GREEN (no red light waits!)")
     if not NO_RENDERING_MODE:
         print("CAMERA: Following vehicle")
     print("="*60)
@@ -720,7 +713,7 @@ def collect_data(scenarios_to_run=None, preview_mode=True):
         if scenario.get('obey_signs', False):
             obey_str = " [OBEYS STOP SIGNS 🛑]"
         elif scenario.get('obey_lights', False):
-            obey_str = " [STOP-AND-GO TRAFFIC LIGHTS 🚦]"
+            obey_str = " [LIGHTS FROZEN GREEN 🟢]"
         
         print(f"\nScenario {tid+1}/{total_scenarios}: {scenario['map']} - {scenario['type']}{obey_str}")
         
@@ -867,8 +860,8 @@ def parse_arguments():
         epilog="""
 Examples:
   python3 track_param_optimizer_available_maps.py
-  python3 track_param_optimizer_available_maps.py --scenario 1 --render
-  python3 track_param_optimizer_available_maps.py --scenarios 1,3,5
+  python3 track_param_optimizer_available_maps.py --scenario 3 --render
+  python3 track_param_optimizer_available_maps.py --scenarios 2,3,4
   python3 track_param_optimizer_available_maps.py --list
         """
     )
@@ -905,7 +898,7 @@ def list_scenarios():
         if scenario.get('obey_signs'):
             markers += "🛑 "
         if scenario.get('obey_lights'):
-            markers += "🚦 "
+            markers += "🟢 "
         if 'S_curves' in scenario['type'] or 'curves' in scenario['type']:
             markers += "🌀 "
         if 'ELEVATION' in scenario['type'] or 'elevation' in scenario['type']:
@@ -916,7 +909,7 @@ def list_scenarios():
     print("\n🌀 = S-curves/winding roads")
     print("⛰️  = ELEVATION (Town04=11.4m, Town03=8.3m)")
     print("🛑 = Obeys STOP signs")
-    print("🚦 = Traffic lights (fast cycling - 2s red!)")
+    print("🟢 = Traffic lights (frozen green)")
 
 
 def main():
@@ -950,7 +943,7 @@ def main():
     print("TRACK PARAMETER OPTIMIZER")
     print("11 DIVERSE SCENARIOS")
     print("Elevation: Town04 (11.4m) + Town03 (8.3m)")
-    print("Traffic Lights: FAST CYCLING (2s red for quick stops)")
+    print("Traffic Lights: FROZEN GREEN")
     if preview_mode:
         print("MODE: Preview (1 config per scenario)")
     else:

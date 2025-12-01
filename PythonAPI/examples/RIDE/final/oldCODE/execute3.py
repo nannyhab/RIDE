@@ -23,24 +23,18 @@ TRACK_SEGMENTS = 20
 # CONFIGURATION FLAGS
 # ========================================
 OBEY_TRAFFIC_RULES = False
-NO_RENDERING_MODE = True
+NO_RENDERING_MODE = False
 AUTOPILOT_SPEED_BOOST = -150
-
 PREVIEW_MODE = True
-
-# SHORT traffic light times for quick stop-and-go
-TRAFFIC_LIGHT_GREEN_TIME = 10  # Green: 3 seconds
-TRAFFIC_LIGHT_YELLOW_TIME = 1.0  # Yellow: 1 second  
-TRAFFIC_LIGHT_RED_TIME = 2.0     # Red: 2 seconds (short stops!)
+TRAFFIC_LIGHT_GREEN_TIME = 8
+TRAFFIC_LIGHT_YELLOW_TIME = 1.5
+TRAFFIC_LIGHT_RED_TIME = 2
 # ========================================
 
 
 def configure_traffic_lights(world, green=None, yellow=None, red=None):
-    """
-    Configure all traffic lights for FAST cycling with SHORT reds.
-    Lights will cycle: Green -> Yellow -> Red -> Green (quickly!)
-    This creates stop-and-go behavior without long waits.
-    """
+    """Configure all traffic lights for deterministic timing"""
+    # Use global variables if not specified
     if green is None:
         green = TRAFFIC_LIGHT_GREEN_TIME
     if yellow is None:
@@ -49,124 +43,116 @@ def configure_traffic_lights(world, green=None, yellow=None, red=None):
         red = TRAFFIC_LIGHT_RED_TIME
     
     lights = world.get_actors().filter('traffic.traffic_light')
-    
     for light in lights:
-        # Set SHORT cycle times
         light.set_green_time(green)
         light.set_yellow_time(yellow)
         light.set_red_time(red)
-        
-        # Set initial state to GREEN (but don't freeze - let it cycle!)
-        light.set_state(carla.TrafficLightState.Green)
-        # DO NOT freeze - let lights cycle naturally with short times
-    
-    world.tick()
     
     if len(lights) > 0:
-        print(f"    Configured {len(lights)} lights - FAST CYCLING (G:{green}s Y:{yellow}s R:{red}s) ✓")
+        print(f"    Configured {len(lights)} traffic lights (G:{green}s Y:{yellow}s R:{red}s)")
 
 
 class MapRouteSelector:
     def __init__(self):
         self.scenarios = [
             # ========================================
-            # SCENARIO 1: Urban Straight Road (Town01)
+            # SCENARIO 1: Highway Straight - Flat
             # ========================================
             {'id': 0, 'map': 'Town01', 'start_idx': 0, 'end_idx': 50, 
-             'type': 'urban_straight_road', 'complexity': 'easy',
+             'type': 'highway_straight_flat', 'complexity': 'easy',
              'obey_traffic': False},
-            # Tests: Straight-line speed, acceleration
-            # Terrain: Urban, flat (0.2m elevation)
+            # Tests: High-speed straight-line stability, top speed, minimal steering
+            # Terrain: FLAT highway
             
             # ========================================
-            # SCENARIO 2: Traffic Light STOP-AND-GO (Town01)
+            # SCENARIO 2: Traffic Light Stop-and-Go
             # ========================================
             {'id': 1, 'map': 'Town01', 'start_idx': 15, 'end_idx': 75, 
              'type': 'traffic_light_stop_go', 'complexity': 'medium',
              'obey_traffic': True, 'obey_lights': True},
-            # Tests: STOP-AND-GO at traffic lights (fast cycling: 2s red!)
+            # Tests: Frequent stops, acceleration from standstill, repeated braking
+            # Terrain: Urban flat
+            
+            # ========================================
+            # SCENARIO 3: S-Curves (Winding Residential)
+            # ========================================
+            {'id': 2, 'map': 'Town02', 'start_idx': 30, 'end_idx': 70, 
+             'type': 'S_curves_winding', 'complexity': 'medium',
+             'obey_traffic': False},
+            # Tests: CONTINUOUS S-CURVES, smooth steering, lateral grip, cornering stability
+            # Terrain: Rolling hills with curves
+            
+            # ========================================
+            # SCENARIO 4: Highway with Elevation Changes
+            # ========================================
+            {'id': 3, 'map': 'Town04', 'start_idx': 150, 'end_idx': 350, 
+             'type': 'highway_elevation_changes', 'complexity': 'medium',
+             'obey_traffic': False},
+            # Tests: UPHILL/DOWNHILL at speed, gear ratio impact on climbing
+            # Terrain: Highway with ELEVATION CHANGES
+            
+            # ========================================
+            # SCENARIO 5: Mountain Road (Town02 Hills)
+            # ========================================
+            {'id': 4, 'map': 'Town02', 'start_idx': 5, 'end_idx': 65, 
+             'type': 'mountain_road_elevation', 'complexity': 'hard',
+             'obey_traffic': False},
+            # Tests: STEEP ELEVATION combined with curves, uphill power, downhill braking
+            # Terrain: Hilly residential area with ELEVATION + CURVES
+            
+            # ========================================
+            # SCENARIO 6: STOP SIGNS Urban (Town03)
+            # ========================================
+            {'id': 5, 'map': 'Town03', 'start_idx': 50, 'end_idx': 130, 
+             'type': 'stop_signs_urban', 'complexity': 'hard',
+             'obey_traffic': True, 'obey_signs': True},
+            # Tests: STOP SIGN stops (22 signs), start-stop cycles, low-gear performance
+            # Terrain: Urban with slight elevation
+            
+            # ========================================
+            # SCENARIO 7: S-Curves High Speed (Town03)
+            # ========================================
+            {'id': 6, 'map': 'Town03', 'start_idx': 100, 'end_idx': 20, 
+             'type': 'S_curves_high_speed', 'complexity': 'hard',
+             'obey_traffic': False},
+            # Tests: FAST S-CURVES, sustained lateral forces, high-speed cornering
+            # Terrain: Large curves with moderate elevation
+            
+            # ========================================
+            # SCENARIO 8: STOP SIGNS Maximum (Town05 - 34 signs!)
+            # ========================================
+            {'id': 7, 'map': 'Town05', 'start_idx': 0, 'end_idx': 100, 
+             'type': 'stop_signs_MAXIMUM', 'complexity': 'hard',
+             'obey_traffic': True, 'obey_signs': True},
+            # Tests: MAXIMUM stop-and-go (34 stop signs!), extreme start-stop
             # Terrain: Urban grid
             
             # ========================================
-            # SCENARIO 3: Residential S-Curves (Town02)
-            # ========================================
-            {'id': 2, 'map': 'Town02', 'start_idx': 30, 'end_idx': 70, 
-             'type': 'residential_S_curves', 'complexity': 'medium',
-             'obey_traffic': False},
-            # Tests: CONTINUOUS S-CURVES, smooth cornering
-            # Terrain: Residential winding roads, flat (0.0m elevation)
-            
-            # ========================================
-            # SCENARIO 4: Highway ELEVATION (Town04 - 11.4m!)
-            # ========================================
-            {'id': 3, 'map': 'Town04', 'start_idx': 0, 'end_idx': 200, 
-             'type': 'highway_ELEVATION_11m', 'complexity': 'medium',
-             'obey_traffic': False},
-            # Tests: MAXIMUM ELEVATION (11.4m!), uphill/downhill at speed, gear ratio impact
-            # Terrain: Highway with HILLS and SLOPES - BEST ELEVATION!
-            
-            # ========================================
-            # SCENARIO 5: Urban Elevation Roads (Town03 - 8.3m)
-            # ========================================
-            {'id': 4, 'map': 'Town03', 'start_idx': 10, 'end_idx': 180, 
-             'type': 'urban_elevation_8m', 'complexity': 'medium',
-             'obey_traffic': False},
-            # Tests: Urban elevation changes (8.3m), mixed driving with hills
-            # Terrain: Urban area with SECOND-BEST elevation
-            
-            # ========================================
-            # SCENARIO 6: Urban STOP SIGNS (Town03)
-            # ========================================
-            {'id': 5, 'map': 'Town03', 'start_idx': 50, 'end_idx': 130, 
-             'type': 'urban_stop_signs', 'complexity': 'hard',
-             'obey_traffic': True, 'obey_signs': True},
-            # Tests: STOP SIGN stops (22 signs)
-            # Terrain: Urban intersections with elevation (8.3m)
-            
-            # ========================================
-            # SCENARIO 7: Large Sweeping Curves (Town03)
-            # ========================================
-            {'id': 6, 'map': 'Town03', 'start_idx': 100, 'end_idx': 20, 
-             'type': 'large_sweeping_curves', 'complexity': 'hard',
-             'obey_traffic': False},
-            # Tests: Fast sweeping turns, sustained lateral forces
-            # Terrain: Large roads with curves and elevation (8.3m)
-            
-            # ========================================
-            # SCENARIO 8: MAXIMUM STOP SIGNS (Town05 - 34 signs!)
-            # ========================================
-            {'id': 7, 'map': 'Town05', 'start_idx': 0, 'end_idx': 100, 
-             'type': 'maximum_stop_signs', 'complexity': 'hard',
-             'obey_traffic': True, 'obey_signs': True},
-            # Tests: EXTREME stop-and-go (34 stop signs!)
-            # Terrain: Dense urban grid, flat (0.4m)
-            
-            # ========================================
-            # SCENARIO 9: Wide Boulevard Curves (Town05)
+            # SCENARIO 9: Boulevard Sweeping Curves
             # ========================================
             {'id': 8, 'map': 'Town05', 'start_idx': 145, 'end_idx': 25, 
-             'type': 'wide_boulevard_curves', 'complexity': 'medium',
+             'type': 'boulevard_sweeping_curves', 'complexity': 'medium',
              'obey_traffic': False},
-            # Tests: Gentle high-speed curves
-            # Terrain: Wide boulevard, flat
+            # Tests: Gentle high-speed sweeping turns, flow, smooth transitions
+            # Terrain: Wide boulevard with gentle curves
             
             # ========================================
-            # SCENARIO 10: Urban Grid 90° Turns (Town05)
+            # SCENARIO 10: Tight 90° Turns Grid
             # ========================================
             {'id': 9, 'map': 'Town05', 'start_idx': 100, 'end_idx': 200, 
-             'type': 'urban_grid_90_turns', 'complexity': 'medium',
+             'type': 'tight_90_degree_grid', 'complexity': 'medium',
              'obey_traffic': False},
-            # Tests: SHARP 90° turns, grid navigation
-            # Terrain: City grid, flat
+            # Tests: SHARP 90° turns, quick direction changes, tight radius cornering
+            # Terrain: Urban grid
             
             # ========================================
-            # SCENARIO 11: Narrow Streets + STOP SIGNS (Town10HD)
+            # SCENARIO 11: Complex Urban + STOP SIGNS
             # ========================================
             {'id': 10, 'map': 'Town10HD', 'start_idx': 50, 'end_idx': 130, 
-             'type': 'narrow_streets_stop_signs', 'complexity': 'hard',
+             'type': 'complex_urban_stops', 'complexity': 'hard',
              'obey_traffic': True, 'obey_signs': True},
-            # Tests: Tight spaces + STOP SIGNS
-            # Terrain: Narrow urban streets, flat (0.3m)
+            # Tests: Complex navigation + STOP SIGNS + tight spaces
+            # Terrain: Dense urban with slight elevation
         ]
     
     def get_scenario(self, track_id):
@@ -690,7 +676,7 @@ def collect_data(scenarios_to_run=None, preview_mode=True):
     print(f"NO_RENDERING_MODE: {NO_RENDERING_MODE}")
     print(f"AUTOPILOT_SPEED_BOOST: {AUTOPILOT_SPEED_BOOST}%")
     print(f"PREVIEW_MODE: {preview_mode}")
-    print(f"Traffic Lights: FAST CYCLING (G:{TRAFFIC_LIGHT_GREEN_TIME}s Y:{TRAFFIC_LIGHT_YELLOW_TIME}s R:{TRAFFIC_LIGHT_RED_TIME}s)")
+    print(f"Traffic Light Timing: G={TRAFFIC_LIGHT_GREEN_TIME}s Y={TRAFFIC_LIGHT_YELLOW_TIME}s R={TRAFFIC_LIGHT_RED_TIME}s")
     if not NO_RENDERING_MODE:
         print("CAMERA: Following vehicle")
     print("="*60)
@@ -720,7 +706,7 @@ def collect_data(scenarios_to_run=None, preview_mode=True):
         if scenario.get('obey_signs', False):
             obey_str = " [OBEYS STOP SIGNS 🛑]"
         elif scenario.get('obey_lights', False):
-            obey_str = " [STOP-AND-GO TRAFFIC LIGHTS 🚦]"
+            obey_str = " [OBEYS TRAFFIC LIGHTS 🚦]"
         
         print(f"\nScenario {tid+1}/{total_scenarios}: {scenario['map']} - {scenario['type']}{obey_str}")
         
@@ -728,7 +714,12 @@ def collect_data(scenarios_to_run=None, preview_mode=True):
         world = client.load_world(scenario['map'])
         print("done")
         
-        configure_traffic_lights(world)
+        configure_traffic_lights(
+            world, 
+            green=TRAFFIC_LIGHT_GREEN_TIME,
+            yellow=TRAFFIC_LIGHT_YELLOW_TIME,
+            red=TRAFFIC_LIGHT_RED_TIME
+        )
         
         settings = world.get_settings()
         settings.synchronous_mode = True
@@ -765,7 +756,7 @@ def collect_data(scenarios_to_run=None, preview_mode=True):
             print("  ERROR: no features")
             continue
         
-        print(f"  {feats['total_length']:.0f}m, curves={feats['tight_corners_pct']*100:.0f}%, max_slope={feats['max_slope']:.4f}")
+        print(f"  {feats['total_length']:.0f}m, {feats['tight_corners_pct']*100:.0f}% curves, avg_slope={feats['avg_slope']:.4f}")
         
         if preview_mode:
             print("  [PREVIEW MODE: Testing 1 config only]")
@@ -867,8 +858,8 @@ def parse_arguments():
         epilog="""
 Examples:
   python3 track_param_optimizer_available_maps.py
-  python3 track_param_optimizer_available_maps.py --scenario 1 --render
-  python3 track_param_optimizer_available_maps.py --scenarios 1,3,5
+  python3 track_param_optimizer_available_maps.py --scenario 2 --render
+  python3 track_param_optimizer_available_maps.py --scenarios 2,4,6
   python3 track_param_optimizer_available_maps.py --list
         """
     )
@@ -906,17 +897,17 @@ def list_scenarios():
             markers += "🛑 "
         if scenario.get('obey_lights'):
             markers += "🚦 "
-        if 'S_curves' in scenario['type'] or 'curves' in scenario['type']:
+        if 'S_curves' in scenario['type']:
             markers += "🌀 "
-        if 'ELEVATION' in scenario['type'] or 'elevation' in scenario['type']:
+        if 'elevation' in scenario['type'] or 'mountain' in scenario['type']:
             markers += "⛰️  "
         
         print(f"{i:2d} | {scenario['map']:10} | {scenario['type']:35} | {markers}")
     
     print("\n🌀 = S-curves/winding roads")
-    print("⛰️  = ELEVATION (Town04=11.4m, Town03=8.3m)")
+    print("⛰️  = Elevation changes")
     print("🛑 = Obeys STOP signs")
-    print("🚦 = Traffic lights (fast cycling - 2s red!)")
+    print("🚦 = Obeys traffic lights")
 
 
 def main():
@@ -949,8 +940,7 @@ def main():
     print("="*60)
     print("TRACK PARAMETER OPTIMIZER")
     print("11 DIVERSE SCENARIOS")
-    print("Elevation: Town04 (11.4m) + Town03 (8.3m)")
-    print("Traffic Lights: FAST CYCLING (2s red for quick stops)")
+    print("Focus: S-curves + Elevation + Stop-and-Go")
     if preview_mode:
         print("MODE: Preview (1 config per scenario)")
     else:
