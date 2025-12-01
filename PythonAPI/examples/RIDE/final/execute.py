@@ -22,11 +22,10 @@ TRACK_SEGMENTS = 20
 # ========================================
 # CONFIGURATION FLAGS
 # ========================================
-OBEY_TRAFFIC_RULES = False
-NO_RENDERING_MODE = True
-AUTOPILOT_SPEED_BOOST = -150
-
-PREVIEW_MODE = True
+OBEY_TRAFFIC_RULES = False # Change to True if you want all scenarios to obey traffic rules
+NO_RENDERING_MODE = True # Change to False if you want to see the gui 
+AUTOPILOT_SPEED_BOOST = -150 # Speed boost for the autopilot
+PREVIEW_MODE = False # Change to True if you want to see a preview of all 11 scenarios
 
 # SHORT traffic light times for quick stop-and-go
 TRAFFIC_LIGHT_GREEN_TIME = 10  # Green: 3 seconds
@@ -108,7 +107,7 @@ class MapRouteSelector:
             # ========================================
             # SCENARIO 5: Urban Elevation Roads (Town03 - 8.3m)
             # ========================================
-            {'id': 4, 'map': 'Town03', 'start_idx': 10, 'end_idx': 180, 
+            {'id': 4, 'map': 'Town03_Opt', 'start_idx': 10, 'end_idx': 180, 
              'type': 'urban_elevation_8m', 'complexity': 'medium',
              'obey_traffic': False},
             # Tests: Urban elevation changes (8.3m), mixed driving with hills
@@ -117,7 +116,7 @@ class MapRouteSelector:
             # ========================================
             # SCENARIO 6: Urban STOP SIGNS (Town03)
             # ========================================
-            {'id': 5, 'map': 'Town03', 'start_idx': 50, 'end_idx': 130, 
+            {'id': 5, 'map': 'Town03_Opt', 'start_idx': 50, 'end_idx': 130, 
              'type': 'urban_stop_signs', 'complexity': 'hard',
              'obey_traffic': True, 'obey_signs': True},
             # Tests: STOP SIGN stops (22 signs)
@@ -126,7 +125,7 @@ class MapRouteSelector:
             # ========================================
             # SCENARIO 7: Large Sweeping Curves (Town03)
             # ========================================
-            {'id': 6, 'map': 'Town03', 'start_idx': 100, 'end_idx': 20, 
+            {'id': 6, 'map': 'Town03_Opt', 'start_idx': 100, 'end_idx': 20, 
              'type': 'large_sweeping_curves', 'complexity': 'hard',
              'obey_traffic': False},
             # Tests: Fast sweeping turns, sustained lateral forces
@@ -135,7 +134,7 @@ class MapRouteSelector:
             # ========================================
             # SCENARIO 8: MAXIMUM STOP SIGNS (Town05 - 34 signs!)
             # ========================================
-            {'id': 7, 'map': 'Town05', 'start_idx': 0, 'end_idx': 100, 
+            {'id': 7, 'map': 'Town05_Opt', 'start_idx': 0, 'end_idx': 100, 
              'type': 'maximum_stop_signs', 'complexity': 'hard',
              'obey_traffic': True, 'obey_signs': True},
             # Tests: EXTREME stop-and-go (34 stop signs!)
@@ -144,7 +143,7 @@ class MapRouteSelector:
             # ========================================
             # SCENARIO 9: Wide Boulevard Curves (Town05)
             # ========================================
-            {'id': 8, 'map': 'Town05', 'start_idx': 145, 'end_idx': 25, 
+            {'id': 8, 'map': 'Town05_Opt', 'start_idx': 145, 'end_idx': 25, 
              'type': 'wide_boulevard_curves', 'complexity': 'medium',
              'obey_traffic': False},
             # Tests: Gentle high-speed curves
@@ -153,7 +152,7 @@ class MapRouteSelector:
             # ========================================
             # SCENARIO 10: Urban Grid 90° Turns (Town05)
             # ========================================
-            {'id': 9, 'map': 'Town05', 'start_idx': 100, 'end_idx': 200, 
+            {'id': 9, 'map': 'Town05_Opt', 'start_idx': 100, 'end_idx': 200, 
              'type': 'urban_grid_90_turns', 'complexity': 'medium',
              'obey_traffic': False},
             # Tests: SHARP 90° turns, grid navigation
@@ -162,7 +161,7 @@ class MapRouteSelector:
             # ========================================
             # SCENARIO 11: Narrow Streets + STOP SIGNS (Town10HD)
             # ========================================
-            {'id': 10, 'map': 'Town10HD', 'start_idx': 50, 'end_idx': 130, 
+            {'id': 10, 'map': 'Town10HD_Opt', 'start_idx': 50, 'end_idx': 130, 
              'type': 'narrow_streets_stop_signs', 'complexity': 'hard',
              'obey_traffic': True, 'obey_signs': True},
             # Tests: Tight spaces + STOP SIGNS
