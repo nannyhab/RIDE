@@ -12,7 +12,7 @@ from sklearn.preprocessing import StandardScaler
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import r2_score
 
-DATA_DIR = "track_optimization_data_final"
+DATA_DIR = "track_optimization_data_group2"
 os.makedirs(DATA_DIR, exist_ok=True)
 
 GEAR_RATIOS = [1.5, 2.5, 4.0, 6.0]
@@ -88,8 +88,8 @@ class MapRouteSelector:
              'type': 'residential_S_curves_2', 'complexity': 'medium',
              'obey_traffic': False},
             
-            {'id': 7, 'map': 'Town01', 'start_idx': 60, 'end_idx': 120, 
-             'type': 'urban_route_4', 'complexity': 'medium',
+            {'id': 7, 'map': 'Town02', 'start_idx': 20, 'end_idx': 80, 
+             'type': 'residential_winding_2', 'complexity': 'medium',
              'obey_traffic': False},
             
             # ========================================
@@ -769,18 +769,7 @@ def train_model(dataset):
         print("Not enough data for training (need at least 10 points)")
         return None, None, None
     
-    exclude = {
-        'track_id', 'map_name', 'route_type', 'complexity', 'travel_time', 
-        'obey_traffic', 'obey_signs', 'obey_lights',
-        # Exclude performance metrics (these happen DURING the run)
-        'avg_speed_ms', 'max_speed_ms', 'min_speed_ms', 'speed_std',
-        'avg_speed_kmh', 'max_speed_kmh',
-        'avg_lateral_accel', 'max_lateral_accel',
-        'avg_longitudinal_accel', 'max_longitudinal_accel',
-        'avg_steering', 'max_steering', 'smoothness',
-        'actual_distance_m', 'avg_lateral_offset', 'max_lateral_offset',
-        'stop_count', 'collision_count'
-    }
+    exclude = {'track_id', 'map_name', 'route_type', 'complexity', 'travel_time', 'obey_traffic', 'obey_signs', 'obey_lights'}
     feat_names = [k for k in dataset[0].keys() if k not in exclude]
     
     X = np.array([[d[k] for k in feat_names] for d in dataset])
