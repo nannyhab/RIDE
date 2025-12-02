@@ -106,6 +106,6 @@ df.to_csv('dataset.csv', index=False)
 - CARLA autopilot drives conservatively
 
 ## Contact
-Dataset collected by: [Your name]
-Northwestern University - [Your course]
+Dataset collected by: Adnan Alhabian, Brooks Hu, Wilson Ting
+Northwestern University
 Date: December 2025
