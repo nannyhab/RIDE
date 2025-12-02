@@ -1,3 +1,8 @@
+"""
+Track Parameter Optimizer - LEARNS PHYSICS NOT FINGERPRINTS
+25 scenarios (5 per type) × 16 configs = 400 data points
+"""
+
 import carla
 import numpy as np
 import math
@@ -9,21 +14,17 @@ import sys
 import argparse
 from sklearn.ensemble import RandomForestRegressor
 from sklearn.preprocessing import StandardScaler
-from sklearn.model_selection import train_test_split
-from sklearn.metrics import r2_score
+from sklearn.model_selection import train_test_split, LeaveOneGroupOut
+from sklearn.metrics import r2_score, mean_absolute_error
 
-DATA_DIR = "track_optimization_data_group2"
+DATA_DIR = "track_optimization_data_physics"
 os.makedirs(DATA_DIR, exist_ok=True)
 
 GEAR_RATIOS = [1.5, 2.5, 4.0, 6.0]
-TIRE_FRICTIONS = [0.5, 1.0, 2.0, 3.0]
+TIRE_FRICTIONS = [0.3, 1.0, 2.5, 4.0]  # More extreme for friction testing
 TRACK_SEGMENTS = 20
-
-OBEY_TRAFFIC_RULES = False
 NO_RENDERING_MODE = True
 AUTOPILOT_SPEED_BOOST = -150
-PREVIEW_MODE = True
-
 TRAFFIC_LIGHT_GREEN_TIME = 3.0
 TRAFFIC_LIGHT_YELLOW_TIME = 1.0
 TRAFFIC_LIGHT_RED_TIME = 2.0
@@ -38,79 +39,105 @@ def configure_traffic_lights(world, green=None, yellow=None, red=None):
         red = TRAFFIC_LIGHT_RED_TIME
     
     lights = world.get_actors().filter('traffic.traffic_light')
-    
     for light in lights:
         light.set_green_time(green)
         light.set_yellow_time(yellow)
         light.set_red_time(red)
         light.set_state(carla.TrafficLightState.Green)
-    
     world.tick()
-    
     if len(lights) > 0:
-        print(f"    Configured {len(lights)} lights - FAST CYCLING ✓")
+        print(f"    Configured {len(lights)} lights ✓")
 
 
 class MapRouteSelector:
     def __init__(self):
         self.scenarios = [
             # ========================================
-            # TOWN01 SCENARIOS (4 scenarios)
+            # STRAIGHT SPEED (scenarios 0-4)
             # ========================================
             {'id': 0, 'map': 'Town01', 'start_idx': 0, 'end_idx': 50, 
-             'type': 'urban_straight_road', 'complexity': 'easy',
-             'obey_traffic': False},
-            
-            {'id': 1, 'map': 'Town01', 'start_idx': 15, 'end_idx': 75, 
-             'type': 'traffic_light_stop_go', 'complexity': 'medium',
-             'obey_traffic': True, 'obey_lights': True},
-            
-            {'id': 2, 'map': 'Town01', 'start_idx': 30, 'end_idx': 90, 
-             'type': 'urban_mixed_1', 'complexity': 'medium',
-             'obey_traffic': False},
-            
-            {'id': 3, 'map': 'Town01', 'start_idx': 50, 'end_idx': 110, 
-             'type': 'urban_mixed_2', 'complexity': 'medium',
-             'obey_traffic': False},
+             'type': 'straight_speed', 'obey_traffic': False},
+            {'id': 1, 'map': 'Town01', 'start_idx': 20, 'end_idx': 70, 
+             'type': 'straight_speed', 'obey_traffic': False},
+            {'id': 2, 'map': 'Town04', 'start_idx': 0, 'end_idx': 100, 
+             'type': 'straight_speed', 'obey_traffic': False},
+            {'id': 3, 'map': 'Town04', 'start_idx': 150, 'end_idx': 250, 
+             'type': 'straight_speed', 'obey_traffic': False},
+            {'id': 4, 'map': 'Town02', 'start_idx': 10, 'end_idx': 40, 
+             'type': 'straight_speed', 'obey_traffic': False},
             
             # ========================================
-            # TOWN02 SCENARIOS (4 scenarios - S-CURVES!)
+            # TIGHT CURVES (scenarios 5-9)
             # ========================================
-            {'id': 4, 'map': 'Town02', 'start_idx': 30, 'end_idx': 70, 
-             'type': 'residential_S_curves_1', 'complexity': 'medium',
-             'obey_traffic': False},
-            
-            {'id': 5, 'map': 'Town02', 'start_idx': 5, 'end_idx': 65, 
-             'type': 'residential_winding_1', 'complexity': 'medium',
-             'obey_traffic': False},
-            
+            {'id': 5, 'map': 'Town02', 'start_idx': 30, 'end_idx': 70, 
+             'type': 'tight_curves', 'obey_traffic': False},
             {'id': 6, 'map': 'Town02', 'start_idx': 50, 'end_idx': 10, 
-             'type': 'residential_S_curves_2', 'complexity': 'medium',
-             'obey_traffic': False},
-            
-            {'id': 7, 'map': 'Town02', 'start_idx': 20, 'end_idx': 80, 
-             'type': 'residential_winding_2', 'complexity': 'medium',
-             'obey_traffic': False},
+             'type': 'tight_curves', 'obey_traffic': False},
+            {'id': 7, 'map': 'Town02', 'start_idx': 5, 'end_idx': 65, 
+             'type': 'tight_curves', 'obey_traffic': False},
+            {'id': 8, 'map': 'Town02', 'start_idx': 40, 'end_idx': 80, 
+             'type': 'tight_curves', 'obey_traffic': False},
+            {'id': 9, 'map': 'Town02', 'start_idx': 60, 'end_idx': 20, 
+             'type': 'tight_curves', 'obey_traffic': False},
             
             # ========================================
-            # TOWN04 SCENARIOS (3 scenarios - ELEVATION!)
+            # ELEVATION (scenarios 10-14)
             # ========================================
-            {'id': 8, 'map': 'Town04', 'start_idx': 0, 'end_idx': 200, 
-             'type': 'highway_ELEVATION_route1', 'complexity': 'medium',
-             'obey_traffic': False},
-            
-            {'id': 9, 'map': 'Town04', 'start_idx': 50, 'end_idx': 250, 
-             'type': 'highway_ELEVATION_route2', 'complexity': 'medium',
-             'obey_traffic': False},
-            
-            {'id': 10, 'map': 'Town04', 'start_idx': 100, 'end_idx': 300, 
-             'type': 'highway_ELEVATION_route3', 'complexity': 'hard',
-             'obey_traffic': False},
+
+             {'id': 10, 'map': 'Town04', 'start_idx': 13, 'end_idx': 58, 
+             'type': 'elevation', 'obey_traffic': False},  # 11.0m climb
+            {'id': 11, 'map': 'Town04', 'start_idx': 14, 'end_idx': 298, 
+             'type': 'elevation', 'obey_traffic': False},  # 11.0m climb
+            {'id': 12, 'map': 'Town04', 'start_idx': 10, 'end_idx': 304, 
+             'type': 'elevation', 'obey_traffic': False},  # 11.0m climb
+            {'id': 13, 'map': 'Town04', 'start_idx': 11, 'end_idx': 300, 
+             'type': 'elevation', 'obey_traffic': False},  # 11.0m climb
+            {'id': 14, 'map': 'Town04', 'start_idx': 14, 'end_idx': 301, 
+             'type': 'elevation', 'obey_traffic': False},  # 11.0m climb
+            # ========================================
+            # MIXED (scenarios 20-24)
+            # ========================================
+             {'id': 20, 'map': 'Town02', 'start_idx': 20, 'end_idx': 60, 
+             'type': 'mixed', 'obey_traffic': False},
+            {'id': 21, 'map': 'Town04', 'start_idx': 50, 'end_idx': 150, 
+             'type': 'mixed', 'obey_traffic': False},
+            {'id': 22, 'map': 'Town02', 'start_idx': 15, 'end_idx': 55, 
+             'type': 'mixed', 'obey_traffic': False},
+            {'id': 23, 'map': 'Town02', 'start_idx': 40, 'end_idx': 80, 
+             'type': 'mixed', 'obey_traffic': False},
+            {'id': 24, 'map': 'Town04', 'start_idx': 100, 'end_idx': 200, 
+             'type': 'mixed', 'obey_traffic': False},
+            # ========================================
+            # TIRE FRICTION TESTS (scenarios 50-59)
+            # Sharp turns in Town02 with EXTREME friction values
+            # ========================================
+            {'id': 50, 'map': 'Town02', 'start_idx': 30, 'end_idx': 7,
+             'type': 'tire_friction_test', 'obey_traffic': False},
+            {'id': 51, 'map': 'Town02', 'start_idx': 30, 'end_idx': 72,
+             'type': 'tire_friction_test', 'obey_traffic': False},
+            {'id': 52, 'map': 'Town02', 'start_idx': 30, 'end_idx': 51,
+             'type': 'tire_friction_test', 'obey_traffic': False},
+            {'id': 53, 'map': 'Town02', 'start_idx': 28, 'end_idx': 87,
+             'type': 'tire_friction_test', 'obey_traffic': False},
+            {'id': 54, 'map': 'Town02', 'start_idx': 15, 'end_idx': 48,
+             'type': 'tire_friction_test', 'obey_traffic': False},
+            {'id': 55, 'map': 'Town02', 'start_idx': 15, 'end_idx': 72,
+             'type': 'tire_friction_test', 'obey_traffic': False},
+            {'id': 56, 'map': 'Town02', 'start_idx': 43, 'end_idx': 14,
+             'type': 'tire_friction_test', 'obey_traffic': False},
+            {'id': 57, 'map': 'Town02', 'start_idx': 43, 'end_idx': 13,
+             'type': 'tire_friction_test', 'obey_traffic': False},
+            {'id': 58, 'map': 'Town02', 'start_idx': 5, 'end_idx': 93,
+             'type': 'tire_friction_test', 'obey_traffic': False},
+            {'id': 59, 'map': 'Town02', 'start_idx': 5, 'end_idx': 84,
+             'type': 'tire_friction_test', 'obey_traffic': False},
         ]
     
     def get_scenario(self, track_id):
-        if track_id < len(self.scenarios):
-            return self.scenarios[track_id]
+        # Find scenario by ID, not by index
+        for scenario in self.scenarios:
+            if scenario['id'] == track_id:
+                return scenario
         return None
     
     def get_total_scenarios(self):
@@ -159,7 +186,6 @@ class TrackFeatureExtractor:
             curvatures.append(curvature)
             
             if len(seg_z) > 1:
-                # Calculate slope as elevation change / horizontal distance
                 elevation_change = abs(seg_z[-1] - seg_z[0])
                 horizontal_distance = end_s - start_s
                 slope = elevation_change / max(horizontal_distance, 1e-6)
@@ -169,7 +195,6 @@ class TrackFeatureExtractor:
         
         curvature_array = np.array(curvatures)
         
-        # Calculate total elevation change
         elevation_range = np.max(z) - np.min(z)
         max_elevation = np.max(z)
         min_elevation = np.min(z)
@@ -186,8 +211,6 @@ class TrackFeatureExtractor:
             'max_slope': np.max(slopes),
             'tight_corners_pct': np.sum(np.abs(curvature_array) > 0.02) / len(curvature_array),
             'straight_pct': np.sum(np.abs(curvature_array) < 0.005) / len(curvature_array),
-            **{f'curvature_{i}': curvatures[i] for i in range(self.num_segments)},
-            **{f'slope_{i}': slopes[i] for i in range(self.num_segments)},
         }
         
         return features
@@ -523,7 +546,7 @@ def test_one_config(world, traffic_manager, start_loc, end_loc, waypoints, route
                 collision_sensor.destroy()
                 vehicle.destroy()
                 world.tick()
-                print(f"SEVERE COLLISION ({collision_tracker.collision_count} total)")
+                print(f"COLLISION")
                 return None
             
             dist_to_end = current_location.distance(end_loc)
@@ -564,17 +587,12 @@ def test_one_config(world, traffic_manager, start_loc, end_loc, waypoints, route
         
         perf = metrics.get_summary()
         
-        stop_info = f" stops={perf['stop_count']}" if obey_traffic else ""
-        print(f"{sim_elapsed_time:.1f}s | {perf['actual_distance_m']:.0f}m | {perf['avg_speed_kmh']:.1f}km/h{stop_info} ✓")
+        print(f"{sim_elapsed_time:.1f}s ✓")
         
         return {
             'track_id': scenario['id'],
             'map_name': scenario['map'],
             'route_type': scenario['type'],
-            'complexity': scenario['complexity'],
-            'obey_traffic': obey_traffic,
-            'obey_signs': obey_signs,
-            'obey_lights': obey_lights,
             'gear_ratio': gear,
             'tire_friction': friction,
             'travel_time': sim_elapsed_time,
@@ -605,7 +623,7 @@ def test_one_config(world, traffic_manager, start_loc, end_loc, waypoints, route
         return None
 
 
-def collect_data(scenarios_to_run=None, preview_mode=True):
+def collect_data(scenarios_to_run=None, preview_mode=False):
     ckpt = f'{DATA_DIR}/dataset_checkpoint.pkl'
     
     if os.path.exists(ckpt):
@@ -617,8 +635,10 @@ def collect_data(scenarios_to_run=None, preview_mode=True):
         dataset = []
         done = set()
     
+    print("\nConnecting to CARLA...", end=" ", flush=True)
     client = carla.Client('localhost', 2000)
     client.set_timeout(30.0)
+    print("done")
     
     selector = MapRouteSelector()
     total_scenarios = selector.get_total_scenarios()
@@ -627,15 +647,11 @@ def collect_data(scenarios_to_run=None, preview_mode=True):
         scenarios_to_run = list(range(total_scenarios))
     
     print("\n" + "="*60)
-    print("CONFIGURATION - FINAL STABLE VERSION")
+    print("DATA COLLECTION - PHYSICS LEARNING")
     print("="*60)
-    print(f"Maps: Town01 (urban+lights), Town02 (S-curves), Town04 (elevation)")
     print(f"Scenarios to run: {scenarios_to_run}")
     print(f"Total scenarios: {total_scenarios}")
-    print(f"Gear Ratios: {GEAR_RATIOS}")
-    print(f"Tire Frictions: {TIRE_FRICTIONS}")
-    print(f"Total data points: {len(scenarios_to_run)} × {'1' if preview_mode else '16'} = {len(scenarios_to_run) * (1 if preview_mode else 16)}")
-    print(f"Traffic Lights: FAST CYCLING (G:{TRAFFIC_LIGHT_GREEN_TIME}s Y:{TRAFFIC_LIGHT_YELLOW_TIME}s R:{TRAFFIC_LIGHT_RED_TIME}s)")
+    print(f"Configs per scenario: {'1 (preview)' if preview_mode else '16 (full)'}")
     print("="*60)
     
     print("\nInitializing Traffic Manager...", end=" ", flush=True)
@@ -649,21 +665,18 @@ def collect_data(scenarios_to_run=None, preview_mode=True):
     print("="*60)
     
     for tid in scenarios_to_run:
-        if tid >= total_scenarios:
-            print(f"\n⚠️  Scenario {tid} doesn't exist (max is {total_scenarios-1})")
+        scenario = selector.get_scenario(tid)
+        if scenario is None:
+            print(f"\n⚠️  Scenario {tid} doesn't exist")
             continue
             
         if tid in done:
-            print(f"\nScenario {tid+1}/{total_scenarios} SKIP (already done)")
+            print(f"\nScenario {tid+1}/{total_scenarios} SKIP (done)")
             continue
         
         scenario = selector.get_scenario(tid)
         
-        obey_str = ""
-        if scenario.get('obey_lights'):
-            obey_str = " [STOP-AND-GO LIGHTS 🚦]"
-        
-        print(f"\nScenario {tid+1}/{total_scenarios}: {scenario['map']} - {scenario['type']}{obey_str}")
+        print(f"\nScenario {tid+1}/{total_scenarios}: {scenario['map']} - {scenario['type']}")
         
         print(f"  Loading {scenario['map']}...", end=" ", flush=True)
         world = client.load_world(scenario['map'])
@@ -675,14 +688,7 @@ def collect_data(scenarios_to_run=None, preview_mode=True):
         settings = world.get_settings()
         settings.synchronous_mode = True
         settings.fixed_delta_seconds = 0.05
-        
-        rendering_enabled = not NO_RENDERING_MODE
-        
-        if NO_RENDERING_MODE:
-            settings.no_rendering_mode = True
-        else:
-            settings.no_rendering_mode = False
-        
+        settings.no_rendering_mode = NO_RENDERING_MODE
         world.apply_settings(settings)
         
         print("  Planning route...", end=" ", flush=True)
@@ -708,45 +714,28 @@ def collect_data(scenarios_to_run=None, preview_mode=True):
             continue
         
         elev_str = f"elev={feats['elevation_range']:.1f}m" if feats.get('elevation_range', 0) > 1 else "flat"
-        print(f"  {feats['total_length']:.0f}m, curves={feats['tight_corners_pct']*100:.0f}%, {elev_str}, max_slope={feats['max_slope']:.4f}")
+        print(f"  {feats['total_length']:.0f}m, curves={feats['tight_corners_pct']*100:.0f}%, {elev_str}")
         
         if preview_mode:
-            print("  [PREVIEW MODE: Testing 1 config only]")
-            gear = 2.5
-            friction = 1.0
-            
+            configs = [(2.5, 1.0)]
+        else:
+            configs = [(g, f) for g in GEAR_RATIOS for f in TIRE_FRICTIONS]
+        
+        results = []
+        for gear, friction in configs:
             res = test_one_config(
                 world, traffic_manager,
                 start_loc, end_loc, waypoints,
                 feats['total_length'],
                 scenario, gear, friction,
-                rendering_enabled
+                not NO_RENDERING_MODE
             )
-            
             if res:
                 res.update(feats)
-                dataset.append(res)
-                print(f"  ✓ Preview complete ({len(dataset)} total)")
-            else:
-                print(f"  ✗ Preview failed")
-            
-        else:
-            results = []
-            for gear in GEAR_RATIOS:
-                for friction in TIRE_FRICTIONS:
-                    res = test_one_config(
-                        world, traffic_manager,
-                        start_loc, end_loc, waypoints,
-                        feats['total_length'],
-                        scenario, gear, friction,
-                        rendering_enabled
-                    )
-                    if res:
-                        res.update(feats)
-                        results.append(res)
-            
-            dataset.extend(results)
-            print(f"  ✓ {len(results)} results ({len(dataset)} total)")
+                results.append(res)
+        
+        dataset.extend(results)
+        print(f"  ✓ {len(results)} results ({len(dataset)} total)")
         
         with open(ckpt, 'wb') as f:
             pickle.dump(dataset, f)
@@ -760,59 +749,10 @@ def collect_data(scenarios_to_run=None, preview_mode=True):
     return dataset
 
 
-def train_model(dataset):
-    print("\n" + "="*60)
-    print("TRAINING")
-    print("="*60)
-    
-    if len(dataset) < 10:
-        print("Not enough data for training (need at least 10 points)")
-        return None, None, None
-    
-    exclude = {'track_id', 'map_name', 'route_type', 'complexity', 'travel_time', 'obey_traffic', 'obey_signs', 'obey_lights'}
-    feat_names = [k for k in dataset[0].keys() if k not in exclude]
-    
-    X = np.array([[d[k] for k in feat_names] for d in dataset])
-    y = np.array([d['travel_time'] for d in dataset])
-    
-    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
-    
-    scaler = StandardScaler()
-    X_train = scaler.fit_transform(X_train)
-    X_test = scaler.transform(X_test)
-    
-    model = RandomForestRegressor(n_estimators=100, max_depth=15, random_state=42)
-    model.fit(X_train, y_train)
-    
-    train_r2 = r2_score(y_train, model.predict(X_train))
-    test_r2 = r2_score(y_test, model.predict(X_test))
-    
-    print(f"Train R²: {train_r2:.3f}")
-    print(f"Test R²: {test_r2:.3f}")
-    
-    importances = model.feature_importances_
-    top = sorted(zip(feat_names, importances), key=lambda x: x[1], reverse=True)[:10]
-    print("\nTop 10 Features:")
-    for name, imp in top:
-        print(f"  {name}: {imp:.3f}")
-    
-    with open(f'{DATA_DIR}/model.pkl', 'wb') as f:
-        pickle.dump({'model': model, 'scaler': scaler, 'features': feat_names}, f)
-    
-    return model, scaler, feat_names
-
-
 def parse_arguments():
-    parser = argparse.ArgumentParser(
-        description='Track Parameter Optimizer - FINAL VERSION',
-        formatter_class=argparse.RawDescriptionHelpFormatter
-    )
-    
-    parser.add_argument('--scenario', type=int, help='Run only scenario N (0-10)')
-    parser.add_argument('--scenarios', type=str, help='Run multiple scenarios (comma-separated)')
-    parser.add_argument('--full', action='store_true', help='Full mode: 16 configs per scenario')
-    parser.add_argument('--render', action='store_true', help='Enable rendering')
-    
+    parser = argparse.ArgumentParser(description='Physics-Learning Track Optimizer')
+    parser.add_argument('--scenarios', type=str, help='Scenarios (comma-separated)')
+    parser.add_argument('--preview', action='store_true', help='Preview mode (1 config)')
     return parser.parse_args()
 
 
@@ -820,33 +760,14 @@ def main():
     args = parse_arguments()
     
     scenarios_to_run = None
-    
-    if args.scenario is not None:
-        scenarios_to_run = [args.scenario]
-    elif args.scenarios is not None:
+    if args.scenarios:
         try:
             scenarios_to_run = [int(s.strip()) for s in args.scenarios.split(',')]
         except ValueError:
             print("ERROR: --scenarios must be comma-separated numbers")
             return
     
-    preview_mode = not args.full
-    
-    global NO_RENDERING_MODE
-    if args.render:
-        NO_RENDERING_MODE = False
-    
-    print("="*60)
-    print("TRACK PARAMETER OPTIMIZER - FINAL")
-    print("11 scenarios using ONLY stable maps")
-    print("Town01 (urban+lights) + Town02 (S-curves) + Town04 (elevation)")
-    print(f"MODE: {'Preview (1 config/scenario)' if preview_mode else 'Full (16 configs/scenario)'}")
-    print("="*60)
-    
-    dataset = collect_data(scenarios_to_run, preview_mode)
-    
-    if len(dataset) >= 10 and (not preview_mode or len(dataset) >= 50):
-        train_model(dataset)
+    dataset = collect_data(scenarios_to_run, args.preview)
     
     print("\n✓ DONE")
 

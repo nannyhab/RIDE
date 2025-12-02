@@ -1,0 +1,100 @@
+{
+  "total_points": 257,
+  "total_scenarios": 17,
+  "scenarios_collected": [
+    0,
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7,
+    8,
+    9,
+    10,
+    11,
+    12,
+    13,
+    14,
+    20,
+    50
+  ],
+  "by_type": {
+    "straight_speed": 80,
+    "tight_curves": 80,
+    "elevation": 80,
+    "mixed": 16,
+    "tire_friction_test": 1
+  },
+  "by_scenario": {
+    "0": {
+      "type": "straight_speed",
+      "count": 16
+    },
+    "1": {
+      "type": "straight_speed",
+      "count": 16
+    },
+    "2": {
+      "type": "straight_speed",
+      "count": 16
+    },
+    "3": {
+      "type": "straight_speed",
+      "count": 16
+    },
+    "4": {
+      "type": "straight_speed",
+      "count": 16
+    },
+    "5": {
+      "type": "tight_curves",
+      "count": 16
+    },
+    "6": {
+      "type": "tight_curves",
+      "count": 16
+    },
+    "7": {
+      "type": "tight_curves",
+      "count": 16
+    },
+    "8": {
+      "type": "tight_curves",
+      "count": 16
+    },
+    "9": {
+      "type": "tight_curves",
+      "count": 16
+    },
+    "10": {
+      "type": "elevation",
+      "count": 16
+    },
+    "11": {
+      "type": "elevation",
+      "count": 16
+    },
+    "12": {
+      "type": "elevation",
+      "count": 16
+    },
+    "13": {
+      "type": "elevation",
+      "count": 16
+    },
+    "14": {
+      "type": "elevation",
+      "count": 16
+    },
+    "20": {
+      "type": "mixed",
+      "count": 16
+    },
+    "50": {
+      "type": "tire_friction_test",
+      "count": 1
+    }
+  }
+}
