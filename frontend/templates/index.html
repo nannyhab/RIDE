@@ -45,7 +45,7 @@
     }
 
     .title {
-      font-size: 26px;
+      font-size: 40px;
       font-weight: 650;
       letter-spacing: 0.03em;
       display: flex;
@@ -64,9 +64,9 @@
     }
 
     .subtitle {
-      font-size: 13px;
+      font-size: 20px;
       color: var(--muted);
-      max-width: 480px;
+      
       line-height: 1.4;
     }
 
@@ -100,7 +100,7 @@
     }
 
     .card-title {
-      font-size: 14px;
+      font-size: 20px;
       text-transform: uppercase;
       letter-spacing: 0.09em;
       color: var(--muted);
@@ -145,12 +145,12 @@
     }
 
     .checkbox-label-main {
-      font-size: 14px;
+      font-size: 24px;
       font-weight: 500;
     }
 
     .checkbox-label-sub {
-      font-size: 12px;
+      font-size: 18px;
       color: var(--muted);
       line-height: 1.35;
     }
@@ -172,7 +172,7 @@
       border: none;
       border-radius: 999px;
       padding: 8px 16px;
-      font-size: 13px;
+      font-size: 18px;
       font-weight: 500;
       cursor: pointer;
       background: #38bdf8;
@@ -213,7 +213,7 @@
     }
 
     .status-text {
-      font-size: 12px;
+      font-size: 18px;
       color: var(--muted);
       margin-top: 4px;
     }
@@ -223,7 +223,7 @@
     }
 
     .details-body {
-      font-size: 13px;
+      font-size: 18px;
       color: var(--muted);
       line-height: 1.4;
     }
@@ -265,7 +265,7 @@
     }
 
     .results-title {
-      font-size: 14px;
+      font-size: 24px;
       font-weight: 600;
     }
 
@@ -300,7 +300,7 @@
     }
 
     .metric-label {
-      font-size: 11px;
+      font-size: 18px;
       color: var(--muted);
       text-transform: uppercase;
       letter-spacing: 0.08em;
@@ -308,12 +308,12 @@
     }
 
     .metric-value {
-      font-size: 15px;
+      font-size: 20px;
       font-weight: 600;
     }
 
     .metric-sub {
-      font-size: 11px;
+      font-size: 16px;
       color: var(--muted);
       margin-top: 2px;
     }
@@ -322,7 +322,7 @@
     .metric-bad { color: var(--danger); }
 
     .results-text {
-      font-size: 13px;
+      font-size: 20px;
       color: var(--muted);
       margin-top: 8px;
       line-height: 1.45;
@@ -357,9 +357,9 @@
           
         </div>
         <p class="subtitle">
-          Select the characteristics of a representative route. We’ll suggest
-          tire friction and gear ratio settings that minimize travel time over
-          CARLA tracks matching those features.
+          A digital-twin–based tool that uses precomputed CARLA simulations to
+          recommend tire friction and gear ratio settings tailored to the driving
+          environments you care about.
         </p>
       </div>
     </header>
@@ -370,6 +370,13 @@
         <div class="card-header">
           <div class="card-title">1 · Select environment parameters</div>
           
+        </div>
+
+        <div class="details-body" style="margin-bottom: 8px;">
+          Select the characteristics of a representative route. Then click 
+          <strong>Run optimization</strong> and we’ll suggest tire friction 
+          and gear ratio settings that minimize travel time over CARLA 
+          tracks matching those features.
         </div>
 
         <div class="checkbox-group" id="checkboxGroup">
