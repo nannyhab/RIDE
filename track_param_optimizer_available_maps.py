@@ -1,6 +1,6 @@
 """
-Track Parameter Optimizer - AVAILABLE CARLA MAPS
-Uses 7 maps with multiple routes each = 20 diverse scenarios
+Track Parameter Optimizer - FIXED COMPLETION
+Uses actual distance traveled for completion check
 """
 
 import carla
@@ -18,80 +18,54 @@ from sklearn.metrics import r2_score
 DATA_DIR = "track_optimization_data_real_maps"
 os.makedirs(DATA_DIR, exist_ok=True)
 
-GEAR_RATIOS = [2.5, 3.0, 3.5, 4.0]
-TIRE_FRICTIONS = [0.6, 0.8, 1.0, 1.2]
+GEAR_RATIOS = [1.5, 2.5, 4.0, 6.0]
+TIRE_FRICTIONS = [0.5, 1.0, 2.0, 3.0]
 TRACK_SEGMENTS = 20
 
+OBEY_TRAFFIC_RULES = False
+NO_RENDERING_MODE = True
+AUTOPILOT_SPEED_BOOST = -150  # Your setting
 
-# ============================================================================
-# MAP & ROUTE SELECTOR - 20 Scenarios from 7 Maps
-# ============================================================================
 
 class MapRouteSelector:
-    """
-    Create 20 diverse scenarios from available maps
-    Each map tested with multiple different routes
-    """
-    
     def __init__(self):
-        # Define 20 scenarios: (map_name, spawn_seed, route_type, complexity)
         self.scenarios = [
-            # Town01 - Small town (3 routes)
-            {'id': 0, 'map': 'Town01', 'seed': 0, 'type': 'town_main_street', 'complexity': 'easy'},
-            {'id': 1, 'map': 'Town01', 'seed': 1, 'type': 'town_curves', 'complexity': 'medium'},
-            {'id': 2, 'map': 'Town01', 'seed': 2, 'type': 'town_complex', 'complexity': 'medium'},
-            
-            # Town02 - Residential (3 routes)
-            {'id': 3, 'map': 'Town02', 'seed': 0, 'type': 'residential_straight', 'complexity': 'easy'},
-            {'id': 4, 'map': 'Town02', 'seed': 1, 'type': 'residential_turns', 'complexity': 'medium'},
-            {'id': 5, 'map': 'Town02', 'seed': 2, 'type': 'residential_loop', 'complexity': 'medium'},
-            
-            # Town03 - Suburban (3 routes)
-            {'id': 6, 'map': 'Town03', 'seed': 0, 'type': 'suburban_highway', 'complexity': 'easy'},
-            {'id': 7, 'map': 'Town03', 'seed': 1, 'type': 'suburban_mixed', 'complexity': 'medium'},
-            {'id': 8, 'map': 'Town03', 'seed': 2, 'type': 'suburban_roundabout', 'complexity': 'hard'},
-            
-            # Town04 - Highway (3 routes)
-            {'id': 9, 'map': 'Town04', 'seed': 0, 'type': 'highway_straight', 'complexity': 'easy'},
-            {'id': 10, 'map': 'Town04', 'seed': 1, 'type': 'highway_exits', 'complexity': 'medium'},
-            {'id': 11, 'map': 'Town04', 'seed': 2, 'type': 'highway_merge', 'complexity': 'medium'},
-            
-            # Town05 - Urban (3 routes)
-            {'id': 12, 'map': 'Town05', 'seed': 0, 'type': 'urban_highway', 'complexity': 'easy'},
-            {'id': 13, 'map': 'Town05', 'seed': 1, 'type': 'urban_streets', 'complexity': 'medium'},
-            {'id': 14, 'map': 'Town05', 'seed': 2, 'type': 'urban_downtown', 'complexity': 'hard'},
-            
-            # Town10HD - Dense city (5 routes - most complex)
-            {'id': 15, 'map': 'Town10HD', 'seed': 0, 'type': 'city_main_avenue', 'complexity': 'medium'},
-            {'id': 16, 'map': 'Town10HD', 'seed': 1, 'type': 'city_intersections', 'complexity': 'hard'},
-            {'id': 17, 'map': 'Town10HD', 'seed': 2, 'type': 'city_tight_turns', 'complexity': 'hard'},
-            {'id': 18, 'map': 'Town10HD', 'seed': 3, 'type': 'city_stop_and_go', 'complexity': 'hard'},
-            {'id': 19, 'map': 'Town10HD', 'seed': 4, 'type': 'city_maximum_density', 'complexity': 'hard'},
+            {'id': 0, 'map': 'Town01', 'start_idx': 0, 'end_idx': 50, 'type': 'route_1', 'complexity': 'easy'},
+            {'id': 1, 'map': 'Town01', 'start_idx': 10, 'end_idx': 60, 'type': 'route_2', 'complexity': 'medium'},
+            {'id': 2, 'map': 'Town01', 'start_idx': 20, 'end_idx': 70, 'type': 'route_3', 'complexity': 'medium'},
+            {'id': 3, 'map': 'Town02', 'start_idx': 0, 'end_idx': 40, 'type': 'route_1', 'complexity': 'easy'},
+            {'id': 4, 'map': 'Town02', 'start_idx': 15, 'end_idx': 55, 'type': 'route_2', 'complexity': 'medium'},
+            {'id': 5, 'map': 'Town02', 'start_idx': 30, 'end_idx': 70, 'type': 'route_3', 'complexity': 'medium'},
+            {'id': 6, 'map': 'Town03', 'start_idx': 0, 'end_idx': 80, 'type': 'route_1', 'complexity': 'easy'},
+            {'id': 7, 'map': 'Town03', 'start_idx': 20, 'end_idx': 100, 'type': 'route_2', 'complexity': 'medium'},
+            {'id': 8, 'map': 'Town03', 'start_idx': 40, 'end_idx': 120, 'type': 'route_3', 'complexity': 'hard'},
+            {'id': 9, 'map': 'Town04', 'start_idx': 0, 'end_idx': 60, 'type': 'route_1', 'complexity': 'easy'},
+            {'id': 10, 'map': 'Town04', 'start_idx': 25, 'end_idx': 85, 'type': 'route_2', 'complexity': 'medium'},
+            {'id': 11, 'map': 'Town04', 'start_idx': 50, 'end_idx': 110, 'type': 'route_3', 'complexity': 'medium'},
+            {'id': 12, 'map': 'Town05', 'start_idx': 0, 'end_idx': 100, 'type': 'route_1', 'complexity': 'easy'},
+            {'id': 13, 'map': 'Town05', 'start_idx': 30, 'end_idx': 130, 'type': 'route_2', 'complexity': 'medium'},
+            {'id': 14, 'map': 'Town05', 'start_idx': 60, 'end_idx': 160, 'type': 'route_3', 'complexity': 'hard'},
+            {'id': 15, 'map': 'Town10HD', 'start_idx': 0, 'end_idx': 80, 'type': 'route_1', 'complexity': 'medium'},
+            {'id': 16, 'map': 'Town10HD', 'start_idx': 20, 'end_idx': 100, 'type': 'route_2', 'complexity': 'hard'},
+            {'id': 17, 'map': 'Town10HD', 'start_idx': 40, 'end_idx': 120, 'type': 'route_3', 'complexity': 'hard'},
+            {'id': 18, 'map': 'Town10HD', 'start_idx': 60, 'end_idx': 140, 'type': 'route_4', 'complexity': 'hard'},
+            {'id': 19, 'map': 'Town10HD', 'start_idx': 80, 'end_idx': 160, 'type': 'route_5', 'complexity': 'hard'},
         ]
     
     def get_scenario(self, track_id):
-        """Get scenario info for track_id"""
         if track_id < len(self.scenarios):
             return self.scenarios[track_id]
         return None
     
     def get_total_scenarios(self):
-        """Total number of scenarios"""
         return len(self.scenarios)
 
 
-# ============================================================================
-# TRACK FEATURE EXTRACTION
-# ============================================================================
-
 class TrackFeatureExtractor:
-    """Extract numerical features from track waypoints"""
-    
     def __init__(self, num_segments=TRACK_SEGMENTS):
         self.num_segments = num_segments
     
     def extract_features(self, waypoints):
-        """Extract features from waypoints"""
         if len(waypoints) < 3:
             return None
         
@@ -152,7 +126,6 @@ class TrackFeatureExtractor:
         return features
     
     def _compute_curvature(self, x, y):
-        """Compute curvature from points"""
         if len(x) < 3:
             return 0.0
         
@@ -169,207 +142,380 @@ class TrackFeatureExtractor:
         return np.mean(curvature)
 
 
-# ============================================================================
-# WAYPOINT EXTRACTION
-# ============================================================================
-
-def get_route_waypoints(world, seed=0, route_length=500):
-    """
-    Get a route through the map using seed for reproducibility
-    """
-    np.random.seed(seed)  # Reproducible routes
-    
+def get_planned_route(world, start_spawn_idx, end_spawn_idx):
     map_obj = world.get_map()
     spawn_points = map_obj.get_spawn_points()
     
-    if not spawn_points:
-        return []
+    if len(spawn_points) == 0:
+        return None, None, []
     
-    # Pick spawn point based on seed
-    spawn_idx = seed % len(spawn_points)
-    start_transform = spawn_points[spawn_idx]
-    start_wp = map_obj.get_waypoint(start_transform.location)
+    start_idx = start_spawn_idx % len(spawn_points)
+    end_idx = end_spawn_idx % len(spawn_points)
     
-    if not start_wp:
-        return []
+    start_location = spawn_points[start_idx].location
+    end_location = spawn_points[end_idx].location
     
-    # Follow road forward
+    start_wp = map_obj.get_waypoint(start_location)
+    end_wp = map_obj.get_waypoint(end_location)
+    
+    if not start_wp or not end_wp:
+        return None, None, []
+    
     waypoints = [start_wp]
     current_wp = start_wp
-    distance = 0.0
     
-    for _ in range(route_length):
-        next_wps = current_wp.next(2.0)  # 2m spacing
-        
+    for _ in range(300):
+        next_wps = current_wp.next(3.0)
         if not next_wps:
             break
-        
-        # If multiple choices, use seed to pick
-        if len(next_wps) > 1:
-            choice_idx = (seed + len(waypoints)) % len(next_wps)
-            current_wp = next_wps[choice_idx]
-        else:
-            current_wp = next_wps[0]
-        
+        current_wp = next_wps[0]
         waypoints.append(current_wp)
-        distance += 2.0
+    
+    return start_location, end_location, waypoints
+
+
+class CollisionTracker:
+    def __init__(self):
+        self.collision_count = 0
+        self.severe_collision = False
+        self.last_collision_time = 0
+        self.min_impulse_severe = 2000.0
+    
+    def on_collision(self, event):
+        impulse = math.sqrt(
+            event.normal_impulse.x**2 +
+            event.normal_impulse.y**2 +
+            event.normal_impulse.z**2
+        )
         
-        if distance > 1000:  # Max 1km route
-            break
+        current_time = time.time()
+        
+        if current_time - self.last_collision_time > 0.5:
+            self.collision_count += 1
+            self.last_collision_time = current_time
+        
+        if impulse > self.min_impulse_severe:
+            self.severe_collision = True
     
-    return waypoints
+    def reset(self):
+        self.collision_count = 0
+        self.severe_collision = False
+        self.last_collision_time = 0
 
 
-# ============================================================================
-# CONTROLLER
-# ============================================================================
+class ComprehensiveMetrics:
+    """Tracks ALL performance metrics"""
+    def __init__(self):
+        self.speeds = []
+        self.lateral_accels = []
+        self.longitudinal_accels = []
+        self.lateral_offsets = []
+        self.steering_angles = []
+        self.total_distance = 0.0
+        self.prev_location = None
+        self.prev_velocity = None
+    
+    def update(self, vehicle, waypoints):
+        location = vehicle.get_location()
+        velocity = vehicle.get_velocity()
+        control = vehicle.get_control()
+        
+        speed = math.sqrt(velocity.x**2 + velocity.y**2 + velocity.z**2)
+        self.speeds.append(speed)
+        
+        if self.prev_location is not None:
+            dist = math.sqrt(
+                (location.x - self.prev_location.x)**2 +
+                (location.y - self.prev_location.y)**2
+            )
+            self.total_distance += dist
+        
+        if len(waypoints) > 0:
+            min_dist = float('inf')
+            for wp in waypoints:
+                dist = location.distance(wp.transform.location)
+                if dist < min_dist:
+                    min_dist = dist
+            self.lateral_offsets.append(min_dist)
+        
+        self.steering_angles.append(abs(control.steer))
+        
+        if self.prev_velocity is not None:
+            dv_long = speed - math.sqrt(
+                self.prev_velocity.x**2 + 
+                self.prev_velocity.y**2 + 
+                self.prev_velocity.z**2
+            )
+            longitudinal_accel = dv_long * 20.0
+            self.longitudinal_accels.append(longitudinal_accel)
+            
+            angular_velocity = vehicle.get_angular_velocity()
+            lateral_accel = abs(angular_velocity.z * speed)
+            self.lateral_accels.append(lateral_accel)
+        
+        self.prev_location = location
+        self.prev_velocity = velocity
+    
+    def get_summary(self):
+        if len(self.speeds) == 0:
+            return {}
+        
+        summary = {
+            'avg_speed_ms': np.mean(self.speeds),
+            'max_speed_ms': np.max(self.speeds),
+            'min_speed_ms': np.min(self.speeds),
+            'speed_std': np.std(self.speeds),
+            'avg_speed_kmh': np.mean(self.speeds) * 3.6,
+            'max_speed_kmh': np.max(self.speeds) * 3.6,
+            'actual_distance_m': self.total_distance,
+        }
+        
+        if len(self.lateral_accels) > 0:
+            summary['avg_lateral_accel'] = np.mean(np.abs(self.lateral_accels))
+            summary['max_lateral_accel'] = np.max(np.abs(self.lateral_accels))
+        else:
+            summary['avg_lateral_accel'] = 0.0
+            summary['max_lateral_accel'] = 0.0
+        
+        if len(self.longitudinal_accels) > 0:
+            summary['avg_longitudinal_accel'] = np.mean(np.abs(self.longitudinal_accels))
+            summary['max_longitudinal_accel'] = np.max(np.abs(self.longitudinal_accels))
+            summary['smoothness'] = 1.0 / (1.0 + np.std(self.longitudinal_accels))
+        else:
+            summary['avg_longitudinal_accel'] = 0.0
+            summary['max_longitudinal_accel'] = 0.0
+            summary['smoothness'] = 1.0
+        
+        if len(self.lateral_offsets) > 0:
+            summary['avg_lateral_offset'] = np.mean(self.lateral_offsets)
+            summary['max_lateral_offset'] = np.max(self.lateral_offsets)
+        else:
+            summary['avg_lateral_offset'] = 0.0
+            summary['max_lateral_offset'] = 0.0
+        
+        if len(self.steering_angles) > 0:
+            summary['avg_steering'] = np.mean(self.steering_angles)
+            summary['max_steering'] = np.max(self.steering_angles)
+        else:
+            summary['avg_steering'] = 0.0
+            summary['max_steering'] = 0.0
+        
+        return summary
 
-def pure_pursuit_controller(vehicle, waypoints):
-    """Pure pursuit controller"""
-    tf = vehicle.get_transform()
-    loc = tf.location
-    
-    min_dist = float('inf')
-    nearest_idx = 0
-    for i, wp in enumerate(waypoints):
-        d = loc.distance(wp.transform.location)
-        if d < min_dist:
-            min_dist = d
-            nearest_idx = i
-    
-    lookahead = 15
-    target_idx = min(nearest_idx + lookahead, len(waypoints) - 1)
-    target = waypoints[target_idx].transform.location
-    
-    yaw = math.radians(tf.rotation.yaw)
-    dx = target.x - loc.x
-    dy = target.y - loc.y
-    
-    local_x = math.cos(yaw) * dx + math.sin(yaw) * dy
-    local_y = -math.sin(yaw) * dx + math.cos(yaw) * dy
-    
-    ld = math.sqrt(local_x**2 + local_y**2) or 1e-6
-    curvature = 2.0 * local_y / (ld * ld)
-    wheelbase = 2.88
-    steer = math.atan(wheelbase * curvature)
-    steer = np.clip(steer / 0.7, -1.0, 1.0)
-    
-    vel = vehicle.get_velocity()
-    speed = math.sqrt(vel.x**2 + vel.y**2)
-    
-    target_speed = 10.0
-    
-    if speed < target_speed * 0.7:
-        throttle = 0.8
-        brake = 0.0
-    elif speed < target_speed:
-        throttle = 0.5
-        brake = 0.0
-    elif speed < target_speed * 1.2:
-        throttle = 0.3
-        brake = 0.0
-    else:
-        throttle = 0.0
-        brake = 0.3
-    
-    return carla.VehicleControl(throttle=throttle, steer=steer, brake=brake)
 
-
-# ============================================================================
-# TESTING
-# ============================================================================
-
-def test_one_config(world, waypoints, features, scenario, gear, friction):
-    """Test ONE config on route"""
+def test_one_config(world, traffic_manager, start_loc, end_loc, waypoints, route_length, scenario, gear, friction, rendering_enabled):
+    """Test with FIXED completion check"""
     print(f"    g={gear:.1f} f={friction:.1f}", end=" ", flush=True)
     
     vehicle = None
+    collision_sensor = None
+    spectator = None
     
     try:
         bp_lib = world.get_blueprint_library()
         vehicle_bp = bp_lib.filter('vehicle.tesla.model3')[0]
         
-        # Spawn at start of route
-        sp = waypoints[0].transform
-        sp.location.z += 2.0
-        vehicle = world.spawn_actor(vehicle_bp, sp)
+        if len(waypoints) < 2:
+            print("ERR: not enough waypoints")
+            return None
         
-        # Settle
+        start_waypoint = waypoints[0]
+        road_yaw = start_waypoint.transform.rotation.yaw
+        
+        spawn_transform = carla.Transform(
+            start_loc + carla.Location(z=2.0),
+            carla.Rotation(pitch=0.0, yaw=road_yaw, roll=0.0)
+        )
+        
+        vehicle = world.spawn_actor(vehicle_bp, spawn_transform)
+        
+        if rendering_enabled:
+            spectator = world.get_spectator()
+        
+        collision_bp = bp_lib.find('sensor.other.collision')
+        collision_tracker = CollisionTracker()
+        collision_sensor = world.spawn_actor(
+            collision_bp,
+            carla.Transform(),
+            attach_to=vehicle
+        )
+        collision_sensor.listen(collision_tracker.on_collision)
+        
         vehicle.set_simulate_physics(False)
-        world.tick()
-        sp.location.z = waypoints[0].transform.location.z + 0.5
-        vehicle.set_transform(sp)
-        world.tick()
-        vehicle.set_simulate_physics(True)
-        for _ in range(15):
+        for _ in range(5):
             world.tick()
         
-        # Physics
+        final_spawn = carla.Transform(
+            start_loc + carla.Location(z=0.3),
+            carla.Rotation(pitch=0.0, yaw=road_yaw, roll=0.0)
+        )
+        vehicle.set_transform(final_spawn)
+        
+        if rendering_enabled and spectator:
+            vt = vehicle.get_transform()
+            yaw_rad = math.radians(vt.rotation.yaw)
+            camera_transform = carla.Transform(
+                carla.Location(
+                    x=vt.location.x - 15.0 * math.cos(yaw_rad),
+                    y=vt.location.y - 15.0 * math.sin(yaw_rad),
+                    z=vt.location.z + 7.0
+                ),
+                carla.Rotation(pitch=-25.0, yaw=vt.rotation.yaw, roll=0.0)
+            )
+            spectator.set_transform(camera_transform)
+        
+        vehicle.set_simulate_physics(True)
+        for _ in range(20):
+            world.tick()
+        
         phys = vehicle.get_physics_control()
         phys.max_rpm = 5000.0 * gear / 3.0
+        
+        if gear < 2.0:
+            phys.mass = 2000.0
+        elif gear > 5.0:
+            phys.mass = 1200.0
+        else:
+            phys.mass = 1500.0
+        
         for w in phys.wheels:
             w.tire_friction = friction
+        
         vehicle.apply_physics_control(phys)
         
         for _ in range(10):
             world.tick()
         
-        # Drive
-        t0 = time.time()
-        start_loc = vehicle.get_location()
-        stuck = 0
-        done = False
+        tm_port = traffic_manager.get_port()
+        vehicle.set_autopilot(True, tm_port)
+        traffic_manager.set_path(vehicle, [end_loc])
         
-        for step in range(2400):
-            control = pure_pursuit_controller(vehicle, waypoints)
-            vehicle.apply_control(control)
-            
+        if OBEY_TRAFFIC_RULES:
+            traffic_manager.ignore_lights_percentage(vehicle, 0)
+            traffic_manager.ignore_signs_percentage(vehicle, 0)
+            traffic_manager.ignore_vehicles_percentage(vehicle, 0)
+            traffic_manager.ignore_walkers_percentage(vehicle, 0)
+            traffic_manager.vehicle_percentage_speed_difference(vehicle, 0)
+        else:
+            traffic_manager.ignore_lights_percentage(vehicle, 100)
+            traffic_manager.ignore_signs_percentage(vehicle, 100)
+            traffic_manager.ignore_vehicles_percentage(vehicle, 100)
+            traffic_manager.ignore_walkers_percentage(vehicle, 100)
+            traffic_manager.vehicle_percentage_speed_difference(vehicle, AUTOPILOT_SPEED_BOOST)
+        
+        traffic_manager.distance_to_leading_vehicle(vehicle, 0.0)
+        traffic_manager.auto_lane_change(vehicle, False)
+        
+        for _ in range(10):
+            world.tick()
+        
+        metrics = ComprehensiveMetrics()
+        
+        sim_start_time = world.get_snapshot().timestamp.elapsed_seconds
+        stuck_counter = 0
+        completed = False
+        
+        for step in range(10000):  # Longer timeout for -150% speed
             world.tick()
             
-            loc = vehicle.get_location()
-            vel = vehicle.get_velocity()
-            dist = math.sqrt((loc.x - start_loc.x)**2 + (loc.y - start_loc.y)**2)
-            speed = math.sqrt(vel.x**2 + vel.y**2)
+            metrics.update(vehicle, waypoints)
+            
+            current_location = vehicle.get_location()
+            velocity = vehicle.get_velocity()
+            speed = math.sqrt(velocity.x**2 + velocity.y**2 + velocity.z**2)
+            
+            if rendering_enabled and spectator and step % 2 == 0:
+                vt = vehicle.get_transform()
+                yaw_rad = math.radians(vt.rotation.yaw)
+                camera_transform = carla.Transform(
+                    carla.Location(
+                        x=vt.location.x - 15.0 * math.cos(yaw_rad),
+                        y=vt.location.y - 15.0 * math.sin(yaw_rad),
+                        z=vt.location.z + 7.0
+                    ),
+                    carla.Rotation(pitch=-25.0, yaw=vt.rotation.yaw, roll=0.0)
+                )
+                spectator.set_transform(camera_transform)
+            
+            if collision_tracker.severe_collision:
+                vehicle.set_autopilot(False, tm_port)
+                world.tick()
+                collision_sensor.stop()
+                collision_sensor.destroy()
+                vehicle.destroy()
+                world.tick()
+                print(f"SEVERE COLLISION ({collision_tracker.collision_count} total)")
+                return None
+            
+            dist_to_end = current_location.distance(end_loc)
             
             if speed < 0.5:
-                stuck += 1
-                if stuck > 100:
+                stuck_counter += 1
+                if stuck_counter > 400:
+                    vehicle.set_autopilot(False, tm_port)
+                    world.tick()
+                    collision_sensor.stop()
+                    collision_sensor.destroy()
                     vehicle.destroy()
                     world.tick()
                     print("STUCK")
                     return None
             else:
-                stuck = 0
+                stuck_counter = 0
             
-            if dist > features['total_length'] * 0.8:
-                done = True
+            # ========================================
+            # FIXED COMPLETION CHECK
+            # Use BOTH distance to end AND actual distance traveled
+            # ========================================
+            if (dist_to_end < 25.0 AND metrics.total_distance > route_length * 0.6) or \
+               (metrics.total_distance > route_length * 0.85):
+                completed = True
                 break
         
-        elapsed = time.time() - t0
+        sim_end_time = world.get_snapshot().timestamp.elapsed_seconds
+        sim_elapsed_time = sim_end_time - sim_start_time
         
+        vehicle.set_autopilot(False, tm_port)
+        world.tick()
+        collision_sensor.stop()
+        collision_sensor.destroy()
         vehicle.destroy()
         world.tick()
         
-        if not done:
+        if not completed:
             print("TIMEOUT")
             return None
         
-        print(f"{elapsed:.1f}s ✓")
+        perf = metrics.get_summary()
+        
+        print(f"{sim_elapsed_time:.1f}s | {perf['actual_distance_m']:.0f}m | {perf['avg_speed_kmh']:.1f}km/h | col={collision_tracker.collision_count} ✓")
         
         return {
             'track_id': scenario['id'],
             'map_name': scenario['map'],
             'route_type': scenario['type'],
             'complexity': scenario['complexity'],
-            'seed': scenario['seed'],
             'gear_ratio': gear,
             'tire_friction': friction,
-            'travel_time': elapsed,
-            **features
+            'travel_time': sim_elapsed_time,
+            'collision_count': collision_tracker.collision_count,
+            **perf
         }
         
     except Exception as e:
         print(f"ERR: {e}")
+        if vehicle:
+            try:
+                vehicle.set_autopilot(False)
+                world.tick()
+            except:
+                pass
+        if collision_sensor:
+            try:
+                collision_sensor.stop()
+                collision_sensor.destroy()
+            except:
+                pass
         if vehicle:
             try:
                 vehicle.destroy()
@@ -379,12 +525,7 @@ def test_one_config(world, waypoints, features, scenario, gear, friction):
         return None
 
 
-# ============================================================================
-# DATA COLLECTION
-# ============================================================================
-
 def collect_data():
-    """Collect data from all scenarios"""
     ckpt = f'{DATA_DIR}/dataset_checkpoint.pkl'
     
     if os.path.exists(ckpt):
@@ -399,10 +540,28 @@ def collect_data():
     client = carla.Client('localhost', 2000)
     client.set_timeout(30.0)
     
+    print("\n" + "="*60)
+    print("CONFIGURATION")
+    print("="*60)
+    print(f"Gear Ratios: {GEAR_RATIOS}")
+    print(f"Tire Frictions: {TIRE_FRICTIONS}")
+    print(f"OBEY_TRAFFIC_RULES: {OBEY_TRAFFIC_RULES}")
+    print(f"NO_RENDERING_MODE: {NO_RENDERING_MODE}")
+    print(f"AUTOPILOT_SPEED_BOOST: {AUTOPILOT_SPEED_BOOST}%")
+    if not NO_RENDERING_MODE:
+        print("CAMERA: Following vehicle")
+    print("="*60)
+    
+    print("\nInitializing Traffic Manager...", end=" ", flush=True)
+    traffic_manager = client.get_trafficmanager(8000)
+    traffic_manager.set_synchronous_mode(True)
+    traffic_manager.set_global_distance_to_leading_vehicle(0.0)
+    print("done\n")
+    
     selector = MapRouteSelector()
     
     print("="*60)
-    print("COLLECTING DATA: 20 SCENARIOS FROM 7 MAPS")
+    print("COLLECTING DATA")
     print("="*60)
     
     for tid in range(selector.get_total_scenarios()):
@@ -412,9 +571,8 @@ def collect_data():
         
         scenario = selector.get_scenario(tid)
         
-        print(f"\nScenario {tid+1}/{selector.get_total_scenarios()}: {scenario['map']} - {scenario['type']} ({scenario['complexity']})")
+        print(f"\nScenario {tid+1}/{selector.get_total_scenarios()}: {scenario['map']} - {scenario['type']}")
         
-        # Load map
         print(f"  Loading {scenario['map']}...", end=" ", flush=True)
         world = client.load_world(scenario['map'])
         print("done")
@@ -422,21 +580,32 @@ def collect_data():
         settings = world.get_settings()
         settings.synchronous_mode = True
         settings.fixed_delta_seconds = 0.05
+        
+        rendering_enabled = not NO_RENDERING_MODE
+        
+        if NO_RENDERING_MODE:
+            settings.no_rendering_mode = True
+        else:
+            settings.no_rendering_mode = False
+        
         world.apply_settings(settings)
         
-        # Get route using seed
         print("  Planning route...", end=" ", flush=True)
-        wps = get_route_waypoints(world, seed=scenario['seed'], route_length=500)
-        print(f"{len(wps)} waypoints")
+        start_loc, end_loc, waypoints = get_planned_route(
+            world,
+            scenario['start_idx'],
+            scenario['end_idx']
+        )
         
-        if len(wps) < 50:
-            print("  ERROR: route too short")
+        if not start_loc or not end_loc or len(waypoints) < 10:
+            print("ERROR: invalid route")
             continue
         
-        # Extract features
+        print(f"{len(waypoints)} waypoints")
+        
         print("  Extracting features...", end=" ", flush=True)
         ext = TrackFeatureExtractor()
-        feats = ext.extract_features(wps)
+        feats = ext.extract_features(waypoints)
         print("done")
         
         if not feats:
@@ -445,12 +614,18 @@ def collect_data():
         
         print(f"  {feats['total_length']:.0f}m, {feats['tight_corners_pct']*100:.0f}% curves")
         
-        # Test all configs
         results = []
         for gear in GEAR_RATIOS:
             for friction in TIRE_FRICTIONS:
-                res = test_one_config(world, wps, feats, scenario, gear, friction)
+                res = test_one_config(
+                    world, traffic_manager,
+                    start_loc, end_loc, waypoints,
+                    feats['total_length'],
+                    scenario, gear, friction,
+                    rendering_enabled
+                )
                 if res:
+                    res.update(feats)
                     results.append(res)
         
         dataset.extend(results)
@@ -459,7 +634,6 @@ def collect_data():
             pickle.dump(dataset, f)
         print(f"  ✓ {len(results)} results ({len(dataset)} total)")
     
-    # Final save
     with open(f'{DATA_DIR}/dataset.pkl', 'wb') as f:
         pickle.dump(dataset, f)
     with open(f'{DATA_DIR}/dataset.json', 'w') as f:
@@ -469,17 +643,12 @@ def collect_data():
     return dataset
 
 
-# ============================================================================
-# TRAINING
-# ============================================================================
-
 def train_model(dataset):
-    """Train model"""
     print("\n" + "="*60)
     print("TRAINING")
     print("="*60)
     
-    exclude = {'track_id', 'map_name', 'route_type', 'complexity', 'seed', 'travel_time'}
+    exclude = {'track_id', 'map_name', 'route_type', 'complexity', 'travel_time'}
     feat_names = [k for k in dataset[0].keys() if k not in exclude]
     
     X = np.array([[d[k] for k in feat_names] for d in dataset])
@@ -501,8 +670,8 @@ def train_model(dataset):
     print(f"Test R²: {test_r2:.3f}")
     
     importances = model.feature_importances_
-    top = sorted(zip(feat_names, importances), key=lambda x: x[1], reverse=True)[:5]
-    print("\nTop Features:")
+    top = sorted(zip(feat_names, importances), key=lambda x: x[1], reverse=True)[:10]
+    print("\nTop 10 Features:")
     for name, imp in top:
         print(f"  {name}: {imp:.3f}")
     
@@ -515,7 +684,7 @@ def train_model(dataset):
 def main():
     print("="*60)
     print("TRACK PARAMETER OPTIMIZER")
-    print("20 Scenarios from 7 Available Maps")
+    print("FIXED: Proper Completion Check")
     print("="*60)
     
     dataset = collect_data()
