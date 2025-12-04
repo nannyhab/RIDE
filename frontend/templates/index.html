@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8" />
   <title>Digital Twin Environment-Aware Vehicle Parameter Optimization</title>
@@ -19,7 +20,9 @@
       --radius-md: 10px;
     }
 
-    * { box-sizing: border-box; }
+    * {
+      box-sizing: border-box;
+    }
 
     body {
       margin: 0;
@@ -66,7 +69,7 @@
     .subtitle {
       font-size: 20px;
       color: var(--muted);
-      
+
       line-height: 1.4;
     }
 
@@ -192,8 +195,8 @@
     }
 
     .btn-primary:not(:disabled):hover {
-      transform: none;  
-      box-shadow: none;      
+      transform: none;
+      box-shadow: none;
       opacity: 0.9;
     }
 
@@ -208,8 +211,13 @@
     }
 
     @keyframes spin {
-      0% { transform: rotate(0); }
-      100% { transform: rotate(360deg); }
+      0% {
+        transform: rotate(0);
+      }
+
+      100% {
+        transform: rotate(360deg);
+      }
     }
 
     .status-text {
@@ -318,8 +326,13 @@
       margin-top: 2px;
     }
 
-    .metric-good { color: #4ade80; }
-    .metric-bad { color: var(--danger); }
+    .metric-good {
+      color: #4ade80;
+    }
+
+    .metric-bad {
+      color: var(--danger);
+    }
 
     .results-text {
       font-size: 20px;
@@ -348,13 +361,14 @@
     }
   </style>
 </head>
+
 <body>
   <div class="page">
     <header class="header">
       <div>
         <div class="title">
           Digital Twin–Based Environment-Aware Vehicle Parameter Optimization
-          
+
         </div>
         <p class="subtitle">
           A digital-twin–based tool that uses precomputed CARLA simulations to
@@ -369,13 +383,13 @@
       <section class="card">
         <div class="card-header">
           <div class="card-title">1 · Select environment parameters</div>
-          
+
         </div>
 
         <div class="details-body" style="margin-bottom: 8px;">
-          Select the characteristics of a representative route. Then click 
-          <strong>Run optimization</strong> and we’ll suggest tire friction 
-          and gear ratio settings that minimize travel time over CARLA 
+          Select the characteristics of a representative route. Then click
+          <strong>Run optimization</strong> and we’ll suggest tire friction
+          and gear ratio settings that minimize travel time over CARLA
           tracks matching those features.
         </div>
 
@@ -471,7 +485,7 @@
       <section class="card">
         <div class="card-header">
           <div class="card-title">2 · Run optimization</div>
-          
+
         </div>
 
         <div class="details-body">
@@ -480,120 +494,62 @@
             <li>Choose a bundle of CARLA tracks whose features match the checked parameters.</li>
             <li>Encode those tracks using curvature, slope, lane width, and related statistics.</li>
             <li>Evaluate a 2D grid of tire friction and gear ratio settings with a trained regression model.</li>
-            <li>Return the parameter pair with the lowest predicted travel time over the bundle.</li>
+            <li>Return the parameter pair with the highest predicted average speed over the bundle.</li>
           </ul>
         </div>
 
-      <div class="button-row">
-        <button class="btn-primary" id="optimizeBtn" disabled>
-          <span id="btnContent">Run optimization</span>
-        </button>
-        <span class="hint">
-          Check at least one parameter to enable the optimizer.
-        </span>
-      </div>
-      <div class="status-text" id="statusText"></div>
-
-      <!-- 🔽 MOVE THIS HERE 🔽 -->
-      <section id="resultsSection" style="display:none; margin-top: 12px;">
-        <div class="results-main">
-          <div class="results-header">
-            <div class="results-title">Recommended vehicle parameters</div>
-            <span class="pill-env" id="resultsEnv">Custom profile</span>
-          </div>
-          <div class="results-grid">
-            <div class="metric">
-              <div class="metric-label">Tire friction coefficient</div>
-              <div class="metric-value" id="resFriction">–</div>
-              <div class="metric-sub">
-                Higher values increase grip but may raise energy usage.
-              </div>
-            </div>
-            <div class="metric">
-              <div class="metric-label">Gear ratio</div>
-              <div class="metric-value" id="resGear">–</div>
-              <div class="metric-sub">
-                Balances acceleration from low speed vs high-speed efficiency.
-              </div>
-            </div>
-            <div class="metric">
-              <div class="metric-label">Predicted travel time</div>
-              <div class="metric-value" id="resTime">–</div>
-              <div class="metric-sub">
-                Lower is better; estimated over matching tracks.
-              </div>
-            </div>
-            <div class="metric">
-              <div class="metric-label">Improvement vs. stock</div>
-              <div class="metric-value" id="resImprovement">–</div>
-              <div class="metric-sub" id="resImprovementSub">
-                Negative values indicate faster lap times than baseline.
-              </div>
-            </div>
-          </div>
-
-          <p class="results-text" id="resultsText">
-            These settings come from evaluating many candidate parameter pairs on
-            tracks whose features match the boxes you selected.
-          </p>
+        <div class="button-row">
+          <button class="btn-primary" id="optimizeBtn" disabled>
+            <span id="btnContent">Run optimization</span>
+          </button>
+          <span class="hint">
+            Check at least one parameter to enable the optimizer.
+          </span>
         </div>
+        <div class="status-text" id="statusText"></div>
+
+        <!-- 🔽 MOVE THIS HERE 🔽 -->
+        <section id="resultsSection" style="display:none; margin-top: 12px;">
+          <div class="results-main">
+            <div class="results-header">
+              <div class="results-title">Recommended vehicle parameters</div>
+              <span class="pill-env" id="resultsEnv">Custom profile</span>
+            </div>
+            <div class="results-grid">
+              <div class="metric">
+                <div class="metric-label">Tire friction coefficient</div>
+                <div class="metric-value" id="resFriction">–</div>
+                <div class="metric-sub">
+                  Higher values increase grip but may raise energy usage.
+                </div>
+              </div>
+              <div class="metric">
+                <div class="metric-label">Gear ratio</div>
+                <div class="metric-value" id="resGear">–</div>
+                <div class="metric-sub">
+                  Balances acceleration from low speed vs high-speed efficiency.
+                </div>
+              </div>
+              <div class="metric">
+                <div class="metric-label">Predicted average speed</div>
+                <div class="metric-value" id="resSpeed">–</div>
+                <div class="metric-sub">
+                  Higher is better; estimated over matching tracks.
+                </div>
+              </div>
+            </div>
+
+            <p class="results-text" id="resultsText">
+              These settings come from evaluating many candidate parameter pairs on
+              tracks whose features match the boxes you selected.
+            </p>
+          </div>
+        </section>
+        <!-- 🔼 END MOVED BLOCK 🔼 -->
       </section>
-      <!-- 🔼 END MOVED BLOCK 🔼 -->
-    </section>
     </div>
 
-    <!-- Results -->
-    <section class="results-card" id="resultsSection" style="display:none;">
-      <div class="results-main">
-        <div class="results-header">
-          <div class="results-title">Recommended vehicle parameters</div>
-          <span class="pill-env" id="resultsEnv">Custom profile</span>
-        </div>
-        <div class="results-grid">
-          <div class="metric">
-            <div class="metric-label">Tire friction coefficient</div>
-            <div class="metric-value" id="resFriction">–</div>
-            <div class="metric-sub">
-              Higher values increase grip but may raise energy usage.
-            </div>
-          </div>
-          <div class="metric">
-            <div class="metric-label">Gear ratio</div>
-            <div class="metric-value" id="resGear">–</div>
-            <div class="metric-sub">
-              Balances acceleration from low speed vs high-speed efficiency.
-            </div>
-          </div>
-          <div class="metric">
-            <div class="metric-label">Predicted travel time</div>
-            <div class="metric-value" id="resTime">–</div>
-            <div class="metric-sub">
-              Lower is better; estimated over tracks matching your selections.
-            </div>
-          </div>
-          <div class="metric">
-            <div class="metric-label">Improvement vs. stock</div>
-            <div class="metric-value" id="resImprovement">–</div>
-            <div class="metric-sub" id="resImprovementSub">
-              Negative values indicate faster lap times than baseline.
-            </div>
-          </div>
-        </div>
-
-        <!-- <p class="results-text" id="resultsText">
-          Results will appear here once you run the optimization.
-        </p> -->
-      </div>
-
-      <!-- <div class="results-secondary">
-        <strong>How this UI talks to the optimizer</strong><br />
-        The frontend sends a JSON payload like:
-        <code>{"environment_flags": { "right_angle_turns": true, "stoplights": true, ... }}</code>
-        to <code>POST /optimize</code>. The backend uses these flags to choose or
-        construct CARLA tracks, run the regression-based parameter search, and
-        return the best tire friction and gear ratio settings.
-      </div> -->
-    </section>
+    <!-- Results section removed (duplicate) -->
   </div>
 
   <script>
@@ -604,9 +560,7 @@
 
     const resFriction = document.getElementById("resFriction");
     const resGear = document.getElementById("resGear");
-    const resTime = document.getElementById("resTime");
-    const resImprovement = document.getElementById("resImprovement");
-    const resImprovementSub = document.getElementById("resImprovementSub");
+    const resSpeed = document.getElementById("resSpeed");
     const resultsText = document.getElementById("resultsText");
     const resultsEnv = document.getElementById("resultsEnv");
 
@@ -689,25 +643,8 @@
           data.tire_friction != null ? data.tire_friction.toFixed(2) : "–";
         resGear.textContent =
           data.gear_ratio != null ? data.gear_ratio.toFixed(2) : "–";
-        resTime.textContent =
-          data.predicted_time != null ? data.predicted_time.toFixed(1) + " s" : "–";
-
-        if (typeof data.improvement_percent === "number") {
-          const val = data.improvement_percent;
-          const sign = val > 0 ? "+" : "";
-          resImprovement.textContent = `${sign}${val.toFixed(1)}%`;
-          const good = val < 0;
-          resImprovement.classList.toggle("metric-good", good);
-          resImprovement.classList.toggle("metric-bad", !good);
-          resImprovementSub.textContent = good
-            ? "The model predicts faster completion time than the baseline parameters."
-            : "The model predicts slower completion time than the baseline parameters.";
-        } else {
-          resImprovement.textContent = "–";
-          resImprovement.classList.remove("metric-good", "metric-bad");
-          resImprovementSub.textContent =
-            "Improvement vs. baseline was not provided.";
-        }
+        resSpeed.textContent =
+          data.predicted_speed_ms != null ? data.predicted_speed_ms.toFixed(1) + " m/s" : "–";
 
         resultsEnv.textContent =
           (data.profile_summary || "Custom profile").toUpperCase();
@@ -731,4 +668,5 @@
     updateButtonState();
   </script>
 </body>
+
 </html>
