@@ -484,23 +484,14 @@
       <!-- Right: explanation + button -->
       <section class="card">
         <div class="card-header">
-          <div class="card-title">2 · Run optimization</div>
+          <div class="card-title">2 · Determine optimized parameters</div>
 
         </div>
 
-        <div class="details-body">
-          Based on your selections, we:
-          <ul>
-            <li>Choose a bundle of CARLA tracks whose features match the checked parameters.</li>
-            <li>Encode those tracks using curvature, slope, lane width, and related statistics.</li>
-            <li>Evaluate a 2D grid of tire friction and gear ratio settings with a trained regression model.</li>
-            <li>Return the parameter pair with the highest predicted average speed over the bundle.</li>
-          </ul>
-        </div>
 
         <div class="button-row">
           <button class="btn-primary" id="optimizeBtn" disabled>
-            <span id="btnContent">Run optimization</span>
+            <span id="btnContent">Optimize</span>
           </button>
           <span class="hint">
             Check at least one parameter to enable the optimizer.
@@ -606,7 +597,7 @@
         btnContent.innerHTML =
           '<span class="spinner"></span><span>Optimizing…</span>';
       } else {
-        btnContent.textContent = "Run optimization";
+        btnContent.textContent = "Optimize";
       }
     }
 
