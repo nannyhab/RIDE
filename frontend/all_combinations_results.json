@@ -1,0 +1,1018 @@
+[
+  {
+    "selected_flags": "intersections_90",
+    "tire_friction": 0.5,
+    "gear_ratio": 6.0,
+    "predicted_speed_ms": 10.761050199926055,
+    "predicted_time": 81.84010985913729,
+    "profile_summary": "Route Type: mixed, Length: 880.7m"
+  },
+  {
+    "selected_flags": "steep_elevation",
+    "tire_friction": 3.0,
+    "gear_ratio": 6.0,
+    "predicted_speed_ms": 24.34863168466881,
+    "predicted_time": 35.93497425893304,
+    "profile_summary": "Route Type: elevation, Length: 875.0m"
+  },
+  {
+    "selected_flags": "high_speed_sections",
+    "tire_friction": 1.0,
+    "gear_ratio": 6.0,
+    "predicted_speed_ms": 21.048850731234023,
+    "predicted_time": 43.65380712314349,
+    "profile_summary": "Route Type: straight_speed, Length: 918.9m"
+  },
+  {
+    "selected_flags": "tight_curves",
+    "tire_friction": 0.5,
+    "gear_ratio": 6.0,
+    "predicted_speed_ms": 10.432952720368704,
+    "predicted_time": 88.22342266638671,
+    "profile_summary": "Route Type: tight_curves, Length: 920.4m"
+  },
+  {
+    "selected_flags": "long_straightaways",
+    "tire_friction": 1.0,
+    "gear_ratio": 6.0,
+    "predicted_speed_ms": 24.806771187113466,
+    "predicted_time": 37.44390847881283,
+    "profile_summary": "Route Type: straight_speed, Length: 928.9m"
+  },
+  {
+    "selected_flags": "narrow_lanes",
+    "tire_friction": 0.5,
+    "gear_ratio": 6.0,
+    "predicted_speed_ms": 11.375123437378326,
+    "predicted_time": 79.45957465525709,
+    "profile_summary": "Route Type: straight_speed, Length: 903.9m"
+  },
+  {
+    "selected_flags": "wide_multi_lane",
+    "tire_friction": 0.5,
+    "gear_ratio": 6.0,
+    "predicted_speed_ms": 13.438914511822707,
+    "predicted_time": 67.2571039268065,
+    "profile_summary": "Route Type: straight_speed, Length: 903.9m"
+  },
+  {
+    "selected_flags": "intersections_90, steep_elevation",
+    "tire_friction": 3.0,
+    "gear_ratio": 6.0,
+    "predicted_speed_ms": 21.139267025789387,
+    "predicted_time": 41.39062398716929,
+    "profile_summary": "Route Type: elevation, Length: 875.0m"
+  },
+  {
+    "selected_flags": "intersections_90, high_speed_sections",
+    "tire_friction": 1.0,
+    "gear_ratio": 6.0,
+    "predicted_speed_ms": 21.048850731234023,
+    "predicted_time": 43.65380712314349,
+    "profile_summary": "Route Type: straight_speed, Length: 918.9m"
+  },
+  {
+    "selected_flags": "intersections_90, tight_curves",
+    "tire_friction": 0.5,
+    "gear_ratio": 6.0,
+    "predicted_speed_ms": 10.432952720368704,
+    "predicted_time": 88.22342266638671,
+    "profile_summary": "Route Type: tight_curves, Length: 920.4m"
+  },
+  {
+    "selected_flags": "intersections_90, long_straightaways",
+    "tire_friction": 1.0,
+    "gear_ratio": 6.0,
+    "predicted_speed_ms": 24.806771187113466,
+    "predicted_time": 37.44390847881283,
+    "profile_summary": "Route Type: straight_speed, Length: 928.9m"
+  },
+  {
+    "selected_flags": "intersections_90, narrow_lanes",
+    "tire_friction": 0.5,
+    "gear_ratio": 6.0,
+    "predicted_speed_ms": 10.70929795725996,
+    "predicted_time": 82.23559882976386,
+    "profile_summary": "Route Type: mixed, Length: 880.7m"
+  },
+  {
+    "selected_flags": "intersections_90, wide_multi_lane",
+    "tire_friction": 1.0,
+    "gear_ratio": 6.0,
+    "predicted_speed_ms": 11.027590665838343,
+    "predicted_time": 79.86200769038862,
+    "profile_summary": "Route Type: mixed, Length: 880.7m"
+  },
+  {
+    "selected_flags": "steep_elevation, high_speed_sections",
+    "tire_friction": 2.0,
+    "gear_ratio": 6.0,
+    "predicted_speed_ms": 22.855875066736328,
+    "predicted_time": 38.93823580283932,
+    "profile_summary": "Route Type: elevation, Length: 890.0m"
+  },
+  {
+    "selected_flags": "steep_elevation, tight_curves",
+    "tire_friction": 0.5,
+    "gear_ratio": 6.0,
+    "predicted_speed_ms": 14.447854380225618,
+    "predicted_time": 60.56037317391287,
+    "profile_summary": "Route Type: elevation, Length: 875.0m"
+  },
+  {
+    "selected_flags": "steep_elevation, long_straightaways",
+    "tire_friction": 0.5,
+    "gear_ratio": 6.0,
+    "predicted_speed_ms": 25.001231958503453,
+    "predicted_time": 35.99692424447576,
+    "profile_summary": "Route Type: elevation, Length: 900.0m"
+  },
+  {
+    "selected_flags": "steep_elevation, narrow_lanes",
+    "tire_friction": 3.0,
+    "gear_ratio": 6.0,
+    "predicted_speed_ms": 23.93934307109088,
+    "predicted_time": 36.54935100894329,
+    "profile_summary": "Route Type: elevation, Length: 875.0m"
+  },
+  {
+    "selected_flags": "steep_elevation, wide_multi_lane",
+    "tire_friction": 3.0,
+    "gear_ratio": 6.0,
+    "predicted_speed_ms": 24.868586274143013,
+    "predicted_time": 35.183642655978325,
+    "profile_summary": "Route Type: elevation, Length: 875.0m"
+  },
+  {
+    "selected_flags": "high_speed_sections, tight_curves",
+    "tire_friction": 2.0,
+    "gear_ratio": 6.0,
+    "predicted_speed_ms": 9.971042815300464,
+    "predicted_time": 92.15309642188504,
+    "profile_summary": "Route Type: straight_speed, Length: 918.9m"
+  },
+  {
+    "selected_flags": "high_speed_sections, long_straightaways",
+    "tire_friction": 1.0,
+    "gear_ratio": 6.0,
+    "predicted_speed_ms": 24.73336242383214,
+    "predicted_time": 37.622605497595764,
+    "profile_summary": "Route Type: straight_speed, Length: 930.5m"
+  },
+  {
+    "selected_flags": "high_speed_sections, narrow_lanes",
+    "tire_friction": 1.0,
+    "gear_ratio": 6.0,
+    "predicted_speed_ms": 20.2698682342566,
+    "predicted_time": 45.33144761307459,
+    "profile_summary": "Route Type: straight_speed, Length: 918.9m"
+  },
+  {
+    "selected_flags": "high_speed_sections, wide_multi_lane",
+    "tire_friction": 1.0,
+    "gear_ratio": 6.0,
+    "predicted_speed_ms": 22.59445755009806,
+    "predicted_time": 40.667604785277966,
+    "profile_summary": "Route Type: straight_speed, Length: 918.9m"
+  },
+  {
+    "selected_flags": "tight_curves, long_straightaways",
+    "tire_friction": 1.0,
+    "gear_ratio": 6.0,
+    "predicted_speed_ms": 24.806771187113466,
+    "predicted_time": 37.44390847881283,
+    "profile_summary": "Route Type: straight_speed, Length: 928.9m"
+  },
+  {
+    "selected_flags": "tight_curves, narrow_lanes",
+    "tire_friction": 0.5,
+    "gear_ratio": 6.0,
+    "predicted_speed_ms": 10.3169275489161,
+    "predicted_time": 89.21559186525623,
+    "profile_summary": "Route Type: tight_curves, Length: 920.4m"
+  },
+  {
+    "selected_flags": "tight_curves, wide_multi_lane",
+    "tire_friction": 0.5,
+    "gear_ratio": 6.0,
+    "predicted_speed_ms": 10.615230850590375,
+    "predicted_time": 86.70850502100258,
+    "profile_summary": "Route Type: tight_curves, Length: 920.4m"
+  },
+  {
+    "selected_flags": "long_straightaways, narrow_lanes",
+    "tire_friction": 1.0,
+    "gear_ratio": 6.0,
+    "predicted_speed_ms": 24.172837304317788,
+    "predicted_time": 38.42587687541391,
+    "profile_summary": "Route Type: straight_speed, Length: 928.9m"
+  },
+  {
+    "selected_flags": "long_straightaways, wide_multi_lane",
+    "tire_friction": 1.0,
+    "gear_ratio": 6.0,
+    "predicted_speed_ms": 26.10421522640825,
+    "predicted_time": 35.58285364753838,
+    "profile_summary": "Route Type: straight_speed, Length: 928.9m"
+  },
+  {
+    "selected_flags": "narrow_lanes, wide_multi_lane",
+    "tire_friction": 0.5,
+    "gear_ratio": 6.0,
+    "predicted_speed_ms": 12.591788489699395,
+    "predicted_time": 71.78189744248998,
+    "profile_summary": "Route Type: straight_speed, Length: 903.9m"
+  },
+  {
+    "selected_flags": "intersections_90, steep_elevation, high_speed_sections",
+    "tire_friction": 2.0,
+    "gear_ratio": 6.0,
+    "predicted_speed_ms": 22.855875066736328,
+    "predicted_time": 38.93823580283932,
+    "profile_summary": "Route Type: elevation, Length: 890.0m"
+  },
+  {
+    "selected_flags": "intersections_90, steep_elevation, tight_curves",
+    "tire_friction": 0.5,
+    "gear_ratio": 6.0,
+    "predicted_speed_ms": 14.447854380225618,
+    "predicted_time": 60.56037317391287,
+    "profile_summary": "Route Type: elevation, Length: 875.0m"
+  },
+  {
+    "selected_flags": "intersections_90, steep_elevation, long_straightaways",
+    "tire_friction": 0.5,
+    "gear_ratio": 6.0,
+    "predicted_speed_ms": 25.001231958503453,
+    "predicted_time": 35.99692424447576,
+    "profile_summary": "Route Type: elevation, Length: 900.0m"
+  },
+  {
+    "selected_flags": "intersections_90, steep_elevation, narrow_lanes",
+    "tire_friction": 3.0,
+    "gear_ratio": 6.0,
+    "predicted_speed_ms": 20.72573038123451,
+    "predicted_time": 42.216483411413485,
+    "profile_summary": "Route Type: elevation, Length: 875.0m"
+  },
+  {
+    "selected_flags": "intersections_90, steep_elevation, wide_multi_lane",
+    "tire_friction": 3.0,
+    "gear_ratio": 6.0,
+    "predicted_speed_ms": 21.910754939618357,
+    "predicted_time": 39.93324078700391,
+    "profile_summary": "Route Type: elevation, Length: 875.0m"
+  },
+  {
+    "selected_flags": "intersections_90, high_speed_sections, tight_curves",
+    "tire_friction": 2.0,
+    "gear_ratio": 6.0,
+    "predicted_speed_ms": 9.971042815300464,
+    "predicted_time": 92.15309642188504,
+    "profile_summary": "Route Type: straight_speed, Length: 918.9m"
+  },
+  {
+    "selected_flags": "intersections_90, high_speed_sections, long_straightaways",
+    "tire_friction": 1.0,
+    "gear_ratio": 6.0,
+    "predicted_speed_ms": 24.73336242383214,
+    "predicted_time": 37.622605497595764,
+    "profile_summary": "Route Type: straight_speed, Length: 930.5m"
+  },
+  {
+    "selected_flags": "intersections_90, high_speed_sections, narrow_lanes",
+    "tire_friction": 1.0,
+    "gear_ratio": 6.0,
+    "predicted_speed_ms": 20.2698682342566,
+    "predicted_time": 45.33144761307459,
+    "profile_summary": "Route Type: straight_speed, Length: 918.9m"
+  },
+  {
+    "selected_flags": "intersections_90, high_speed_sections, wide_multi_lane",
+    "tire_friction": 1.0,
+    "gear_ratio": 6.0,
+    "predicted_speed_ms": 22.59445755009806,
+    "predicted_time": 40.667604785277966,
+    "profile_summary": "Route Type: straight_speed, Length: 918.9m"
+  },
+  {
+    "selected_flags": "intersections_90, tight_curves, long_straightaways",
+    "tire_friction": 1.0,
+    "gear_ratio": 6.0,
+    "predicted_speed_ms": 24.806771187113466,
+    "predicted_time": 37.44390847881283,
+    "profile_summary": "Route Type: straight_speed, Length: 928.9m"
+  },
+  {
+    "selected_flags": "intersections_90, tight_curves, narrow_lanes",
+    "tire_friction": 0.5,
+    "gear_ratio": 6.0,
+    "predicted_speed_ms": 10.3169275489161,
+    "predicted_time": 89.21559186525623,
+    "profile_summary": "Route Type: tight_curves, Length: 920.4m"
+  },
+  {
+    "selected_flags": "intersections_90, tight_curves, wide_multi_lane",
+    "tire_friction": 0.5,
+    "gear_ratio": 6.0,
+    "predicted_speed_ms": 10.615230850590375,
+    "predicted_time": 86.70850502100258,
+    "profile_summary": "Route Type: tight_curves, Length: 920.4m"
+  },
+  {
+    "selected_flags": "intersections_90, long_straightaways, narrow_lanes",
+    "tire_friction": 1.0,
+    "gear_ratio": 6.0,
+    "predicted_speed_ms": 24.172837304317788,
+    "predicted_time": 38.42587687541391,
+    "profile_summary": "Route Type: straight_speed, Length: 928.9m"
+  },
+  {
+    "selected_flags": "intersections_90, long_straightaways, wide_multi_lane",
+    "tire_friction": 1.0,
+    "gear_ratio": 6.0,
+    "predicted_speed_ms": 26.10421522640825,
+    "predicted_time": 35.58285364753838,
+    "profile_summary": "Route Type: straight_speed, Length: 928.9m"
+  },
+  {
+    "selected_flags": "intersections_90, narrow_lanes, wide_multi_lane",
+    "tire_friction": 0.5,
+    "gear_ratio": 6.0,
+    "predicted_speed_ms": 11.003141009829463,
+    "predicted_time": 80.0394659829311,
+    "profile_summary": "Route Type: mixed, Length: 880.7m"
+  },
+  {
+    "selected_flags": "steep_elevation, high_speed_sections, tight_curves",
+    "tire_friction": 0.5,
+    "gear_ratio": 6.0,
+    "predicted_speed_ms": 13.900646429712223,
+    "predicted_time": 64.02345799735873,
+    "profile_summary": "Route Type: elevation, Length: 890.0m"
+  },
+  {
+    "selected_flags": "steep_elevation, high_speed_sections, long_straightaways",
+    "tire_friction": 0.5,
+    "gear_ratio": 6.0,
+    "predicted_speed_ms": 24.883905598287875,
+    "predicted_time": 36.76944719207459,
+    "profile_summary": "Route Type: elevation, Length: 915.0m"
+  },
+  {
+    "selected_flags": "steep_elevation, high_speed_sections, narrow_lanes",
+    "tire_friction": 3.0,
+    "gear_ratio": 6.0,
+    "predicted_speed_ms": 22.36154145994712,
+    "predicted_time": 39.799020761734184,
+    "profile_summary": "Route Type: elevation, Length: 890.0m"
+  },
+  {
+    "selected_flags": "steep_elevation, high_speed_sections, wide_multi_lane",
+    "tire_friction": 2.0,
+    "gear_ratio": 6.0,
+    "predicted_speed_ms": 23.705022709559998,
+    "predicted_time": 37.54341279200295,
+    "profile_summary": "Route Type: elevation, Length: 890.0m"
+  },
+  {
+    "selected_flags": "steep_elevation, tight_curves, long_straightaways",
+    "tire_friction": 0.5,
+    "gear_ratio": 6.0,
+    "predicted_speed_ms": 25.001231958503453,
+    "predicted_time": 35.99692424447576,
+    "profile_summary": "Route Type: elevation, Length: 900.0m"
+  },
+  {
+    "selected_flags": "steep_elevation, tight_curves, narrow_lanes",
+    "tire_friction": 0.5,
+    "gear_ratio": 6.0,
+    "predicted_speed_ms": 13.739504683929486,
+    "predicted_time": 63.68260522900999,
+    "profile_summary": "Route Type: elevation, Length: 875.0m"
+  },
+  {
+    "selected_flags": "steep_elevation, tight_curves, wide_multi_lane",
+    "tire_friction": 0.5,
+    "gear_ratio": 6.0,
+    "predicted_speed_ms": 15.731901256024203,
+    "predicted_time": 55.617400502928064,
+    "profile_summary": "Route Type: elevation, Length: 875.0m"
+  },
+  {
+    "selected_flags": "steep_elevation, long_straightaways, narrow_lanes",
+    "tire_friction": 3.0,
+    "gear_ratio": 6.0,
+    "predicted_speed_ms": 24.618107253849367,
+    "predicted_time": 36.557134289359034,
+    "profile_summary": "Route Type: elevation, Length: 900.0m"
+  },
+  {
+    "selected_flags": "steep_elevation, long_straightaways, wide_multi_lane",
+    "tire_friction": 0.5,
+    "gear_ratio": 6.0,
+    "predicted_speed_ms": 25.985060525399142,
+    "predicted_time": 34.634033349629505,
+    "profile_summary": "Route Type: elevation, Length: 900.0m"
+  },
+  {
+    "selected_flags": "steep_elevation, narrow_lanes, wide_multi_lane",
+    "tire_friction": 3.0,
+    "gear_ratio": 6.0,
+    "predicted_speed_ms": 24.723004271615803,
+    "predicted_time": 35.390822378061685,
+    "profile_summary": "Route Type: elevation, Length: 875.0m"
+  },
+  {
+    "selected_flags": "high_speed_sections, tight_curves, long_straightaways",
+    "tire_friction": 1.0,
+    "gear_ratio": 6.0,
+    "predicted_speed_ms": 24.73336242383214,
+    "predicted_time": 37.622605497595764,
+    "profile_summary": "Route Type: straight_speed, Length: 930.5m"
+  },
+  {
+    "selected_flags": "high_speed_sections, tight_curves, narrow_lanes",
+    "tire_friction": 2.0,
+    "gear_ratio": 6.0,
+    "predicted_speed_ms": 9.864085612562823,
+    "predicted_time": 93.15232106409049,
+    "profile_summary": "Route Type: straight_speed, Length: 918.9m"
+  },
+  {
+    "selected_flags": "high_speed_sections, tight_curves, wide_multi_lane",
+    "tire_friction": 1.0,
+    "gear_ratio": 4.0,
+    "predicted_speed_ms": 10.191608434043717,
+    "predicted_time": 90.15872969724676,
+    "profile_summary": "Route Type: straight_speed, Length: 918.9m"
+  },
+  {
+    "selected_flags": "high_speed_sections, long_straightaways, narrow_lanes",
+    "tire_friction": 1.0,
+    "gear_ratio": 6.0,
+    "predicted_speed_ms": 24.09731259607316,
+    "predicted_time": 38.61565613970302,
+    "profile_summary": "Route Type: straight_speed, Length: 930.5m"
+  },
+  {
+    "selected_flags": "high_speed_sections, long_straightaways, wide_multi_lane",
+    "tire_friction": 1.0,
+    "gear_ratio": 6.0,
+    "predicted_speed_ms": 26.028691251847732,
+    "predicted_time": 35.750300623925476,
+    "profile_summary": "Route Type: straight_speed, Length: 930.5m"
+  },
+  {
+    "selected_flags": "high_speed_sections, narrow_lanes, wide_multi_lane",
+    "tire_friction": 1.0,
+    "gear_ratio": 6.0,
+    "predicted_speed_ms": 21.900795177871878,
+    "predicted_time": 41.95566702132934,
+    "profile_summary": "Route Type: straight_speed, Length: 918.9m"
+  },
+  {
+    "selected_flags": "tight_curves, long_straightaways, narrow_lanes",
+    "tire_friction": 1.0,
+    "gear_ratio": 6.0,
+    "predicted_speed_ms": 24.172837304317788,
+    "predicted_time": 38.42587687541391,
+    "profile_summary": "Route Type: straight_speed, Length: 928.9m"
+  },
+  {
+    "selected_flags": "tight_curves, long_straightaways, wide_multi_lane",
+    "tire_friction": 1.0,
+    "gear_ratio": 6.0,
+    "predicted_speed_ms": 26.10421522640825,
+    "predicted_time": 35.58285364753838,
+    "profile_summary": "Route Type: straight_speed, Length: 928.9m"
+  },
+  {
+    "selected_flags": "tight_curves, narrow_lanes, wide_multi_lane",
+    "tire_friction": 0.5,
+    "gear_ratio": 6.0,
+    "predicted_speed_ms": 10.516616920091447,
+    "predicted_time": 87.52156748707678,
+    "profile_summary": "Route Type: tight_curves, Length: 920.4m"
+  },
+  {
+    "selected_flags": "long_straightaways, narrow_lanes, wide_multi_lane",
+    "tire_friction": 1.0,
+    "gear_ratio": 6.0,
+    "predicted_speed_ms": 25.487434144339716,
+    "predicted_time": 36.44393800979809,
+    "profile_summary": "Route Type: straight_speed, Length: 928.9m"
+  },
+  {
+    "selected_flags": "intersections_90, steep_elevation, high_speed_sections, tight_curves",
+    "tire_friction": 0.5,
+    "gear_ratio": 6.0,
+    "predicted_speed_ms": 13.900646429712223,
+    "predicted_time": 64.02345799735873,
+    "profile_summary": "Route Type: elevation, Length: 890.0m"
+  },
+  {
+    "selected_flags": "intersections_90, steep_elevation, high_speed_sections, long_straightaways",
+    "tire_friction": 0.5,
+    "gear_ratio": 6.0,
+    "predicted_speed_ms": 24.883905598287875,
+    "predicted_time": 36.76944719207459,
+    "profile_summary": "Route Type: elevation, Length: 915.0m"
+  },
+  {
+    "selected_flags": "intersections_90, steep_elevation, high_speed_sections, narrow_lanes",
+    "tire_friction": 3.0,
+    "gear_ratio": 6.0,
+    "predicted_speed_ms": 22.36154145994712,
+    "predicted_time": 39.799020761734184,
+    "profile_summary": "Route Type: elevation, Length: 890.0m"
+  },
+  {
+    "selected_flags": "intersections_90, steep_elevation, high_speed_sections, wide_multi_lane",
+    "tire_friction": 2.0,
+    "gear_ratio": 6.0,
+    "predicted_speed_ms": 23.705022709559998,
+    "predicted_time": 37.54341279200295,
+    "profile_summary": "Route Type: elevation, Length: 890.0m"
+  },
+  {
+    "selected_flags": "intersections_90, steep_elevation, tight_curves, long_straightaways",
+    "tire_friction": 0.5,
+    "gear_ratio": 6.0,
+    "predicted_speed_ms": 25.001231958503453,
+    "predicted_time": 35.99692424447576,
+    "profile_summary": "Route Type: elevation, Length: 900.0m"
+  },
+  {
+    "selected_flags": "intersections_90, steep_elevation, tight_curves, narrow_lanes",
+    "tire_friction": 0.5,
+    "gear_ratio": 6.0,
+    "predicted_speed_ms": 13.739504683929486,
+    "predicted_time": 63.68260522900999,
+    "profile_summary": "Route Type: elevation, Length: 875.0m"
+  },
+  {
+    "selected_flags": "intersections_90, steep_elevation, tight_curves, wide_multi_lane",
+    "tire_friction": 0.5,
+    "gear_ratio": 6.0,
+    "predicted_speed_ms": 15.731901256024203,
+    "predicted_time": 55.617400502928064,
+    "profile_summary": "Route Type: elevation, Length: 875.0m"
+  },
+  {
+    "selected_flags": "intersections_90, steep_elevation, long_straightaways, narrow_lanes",
+    "tire_friction": 3.0,
+    "gear_ratio": 6.0,
+    "predicted_speed_ms": 24.618107253849367,
+    "predicted_time": 36.557134289359034,
+    "profile_summary": "Route Type: elevation, Length: 900.0m"
+  },
+  {
+    "selected_flags": "intersections_90, steep_elevation, long_straightaways, wide_multi_lane",
+    "tire_friction": 0.5,
+    "gear_ratio": 6.0,
+    "predicted_speed_ms": 25.985060525399142,
+    "predicted_time": 34.634033349629505,
+    "profile_summary": "Route Type: elevation, Length: 900.0m"
+  },
+  {
+    "selected_flags": "intersections_90, steep_elevation, narrow_lanes, wide_multi_lane",
+    "tire_friction": 3.0,
+    "gear_ratio": 6.0,
+    "predicted_speed_ms": 21.49351245664127,
+    "predicted_time": 40.70844421515011,
+    "profile_summary": "Route Type: elevation, Length: 875.0m"
+  },
+  {
+    "selected_flags": "intersections_90, high_speed_sections, tight_curves, long_straightaways",
+    "tire_friction": 1.0,
+    "gear_ratio": 6.0,
+    "predicted_speed_ms": 24.73336242383214,
+    "predicted_time": 37.622605497595764,
+    "profile_summary": "Route Type: straight_speed, Length: 930.5m"
+  },
+  {
+    "selected_flags": "intersections_90, high_speed_sections, tight_curves, narrow_lanes",
+    "tire_friction": 2.0,
+    "gear_ratio": 6.0,
+    "predicted_speed_ms": 9.864085612562823,
+    "predicted_time": 93.15232106409049,
+    "profile_summary": "Route Type: straight_speed, Length: 918.9m"
+  },
+  {
+    "selected_flags": "intersections_90, high_speed_sections, tight_curves, wide_multi_lane",
+    "tire_friction": 1.0,
+    "gear_ratio": 4.0,
+    "predicted_speed_ms": 10.191608434043717,
+    "predicted_time": 90.15872969724676,
+    "profile_summary": "Route Type: straight_speed, Length: 918.9m"
+  },
+  {
+    "selected_flags": "intersections_90, high_speed_sections, long_straightaways, narrow_lanes",
+    "tire_friction": 1.0,
+    "gear_ratio": 6.0,
+    "predicted_speed_ms": 24.09731259607316,
+    "predicted_time": 38.61565613970302,
+    "profile_summary": "Route Type: straight_speed, Length: 930.5m"
+  },
+  {
+    "selected_flags": "intersections_90, high_speed_sections, long_straightaways, wide_multi_lane",
+    "tire_friction": 1.0,
+    "gear_ratio": 6.0,
+    "predicted_speed_ms": 26.028691251847732,
+    "predicted_time": 35.750300623925476,
+    "profile_summary": "Route Type: straight_speed, Length: 930.5m"
+  },
+  {
+    "selected_flags": "intersections_90, high_speed_sections, narrow_lanes, wide_multi_lane",
+    "tire_friction": 1.0,
+    "gear_ratio": 6.0,
+    "predicted_speed_ms": 21.900795177871878,
+    "predicted_time": 41.95566702132934,
+    "profile_summary": "Route Type: straight_speed, Length: 918.9m"
+  },
+  {
+    "selected_flags": "intersections_90, tight_curves, long_straightaways, narrow_lanes",
+    "tire_friction": 1.0,
+    "gear_ratio": 6.0,
+    "predicted_speed_ms": 24.172837304317788,
+    "predicted_time": 38.42587687541391,
+    "profile_summary": "Route Type: straight_speed, Length: 928.9m"
+  },
+  {
+    "selected_flags": "intersections_90, tight_curves, long_straightaways, wide_multi_lane",
+    "tire_friction": 1.0,
+    "gear_ratio": 6.0,
+    "predicted_speed_ms": 26.10421522640825,
+    "predicted_time": 35.58285364753838,
+    "profile_summary": "Route Type: straight_speed, Length: 928.9m"
+  },
+  {
+    "selected_flags": "intersections_90, tight_curves, narrow_lanes, wide_multi_lane",
+    "tire_friction": 0.5,
+    "gear_ratio": 6.0,
+    "predicted_speed_ms": 10.516616920091447,
+    "predicted_time": 87.52156748707678,
+    "profile_summary": "Route Type: tight_curves, Length: 920.4m"
+  },
+  {
+    "selected_flags": "intersections_90, long_straightaways, narrow_lanes, wide_multi_lane",
+    "tire_friction": 1.0,
+    "gear_ratio": 6.0,
+    "predicted_speed_ms": 25.487434144339716,
+    "predicted_time": 36.44393800979809,
+    "profile_summary": "Route Type: straight_speed, Length: 928.9m"
+  },
+  {
+    "selected_flags": "steep_elevation, high_speed_sections, tight_curves, long_straightaways",
+    "tire_friction": 0.5,
+    "gear_ratio": 6.0,
+    "predicted_speed_ms": 24.883905598287875,
+    "predicted_time": 36.76944719207459,
+    "profile_summary": "Route Type: elevation, Length: 915.0m"
+  },
+  {
+    "selected_flags": "steep_elevation, high_speed_sections, tight_curves, narrow_lanes",
+    "tire_friction": 0.5,
+    "gear_ratio": 6.0,
+    "predicted_speed_ms": 13.230892506828193,
+    "predicted_time": 67.2643551725268,
+    "profile_summary": "Route Type: elevation, Length: 890.0m"
+  },
+  {
+    "selected_flags": "steep_elevation, high_speed_sections, tight_curves, wide_multi_lane",
+    "tire_friction": 0.5,
+    "gear_ratio": 6.0,
+    "predicted_speed_ms": 15.279608665645709,
+    "predicted_time": 58.245434965215814,
+    "profile_summary": "Route Type: elevation, Length: 890.0m"
+  },
+  {
+    "selected_flags": "steep_elevation, high_speed_sections, long_straightaways, narrow_lanes",
+    "tire_friction": 3.0,
+    "gear_ratio": 6.0,
+    "predicted_speed_ms": 24.457042315621536,
+    "predicted_time": 37.41120618842756,
+    "profile_summary": "Route Type: elevation, Length: 915.0m"
+  },
+  {
+    "selected_flags": "steep_elevation, high_speed_sections, long_straightaways, wide_multi_lane",
+    "tire_friction": 0.5,
+    "gear_ratio": 6.0,
+    "predicted_speed_ms": 25.87601819243067,
+    "predicted_time": 35.35966956061517,
+    "profile_summary": "Route Type: elevation, Length: 915.0m"
+  },
+  {
+    "selected_flags": "steep_elevation, high_speed_sections, narrow_lanes, wide_multi_lane",
+    "tire_friction": 3.0,
+    "gear_ratio": 6.0,
+    "predicted_speed_ms": 23.275157925213744,
+    "predicted_time": 38.236795457560454,
+    "profile_summary": "Route Type: elevation, Length: 890.0m"
+  },
+  {
+    "selected_flags": "steep_elevation, tight_curves, long_straightaways, narrow_lanes",
+    "tire_friction": 3.0,
+    "gear_ratio": 6.0,
+    "predicted_speed_ms": 24.618107253849367,
+    "predicted_time": 36.557134289359034,
+    "profile_summary": "Route Type: elevation, Length: 900.0m"
+  },
+  {
+    "selected_flags": "steep_elevation, tight_curves, long_straightaways, wide_multi_lane",
+    "tire_friction": 0.5,
+    "gear_ratio": 6.0,
+    "predicted_speed_ms": 25.985060525399142,
+    "predicted_time": 34.634033349629505,
+    "profile_summary": "Route Type: elevation, Length: 900.0m"
+  },
+  {
+    "selected_flags": "steep_elevation, tight_curves, narrow_lanes, wide_multi_lane",
+    "tire_friction": 0.5,
+    "gear_ratio": 6.0,
+    "predicted_speed_ms": 15.187149611116668,
+    "predicted_time": 57.61235486798376,
+    "profile_summary": "Route Type: elevation, Length: 875.0m"
+  },
+  {
+    "selected_flags": "steep_elevation, long_straightaways, narrow_lanes, wide_multi_lane",
+    "tire_friction": 0.5,
+    "gear_ratio": 6.0,
+    "predicted_speed_ms": 25.45950058935086,
+    "predicted_time": 35.3489829727945,
+    "profile_summary": "Route Type: elevation, Length: 900.0m"
+  },
+  {
+    "selected_flags": "high_speed_sections, tight_curves, long_straightaways, narrow_lanes",
+    "tire_friction": 1.0,
+    "gear_ratio": 6.0,
+    "predicted_speed_ms": 24.09731259607316,
+    "predicted_time": 38.61565613970302,
+    "profile_summary": "Route Type: straight_speed, Length: 930.5m"
+  },
+  {
+    "selected_flags": "high_speed_sections, tight_curves, long_straightaways, wide_multi_lane",
+    "tire_friction": 1.0,
+    "gear_ratio": 6.0,
+    "predicted_speed_ms": 26.028691251847732,
+    "predicted_time": 35.750300623925476,
+    "profile_summary": "Route Type: straight_speed, Length: 930.5m"
+  },
+  {
+    "selected_flags": "high_speed_sections, tight_curves, narrow_lanes, wide_multi_lane",
+    "tire_friction": 2.0,
+    "gear_ratio": 6.0,
+    "predicted_speed_ms": 10.09384832842379,
+    "predicted_time": 91.03192757490275,
+    "profile_summary": "Route Type: straight_speed, Length: 918.9m"
+  },
+  {
+    "selected_flags": "high_speed_sections, long_straightaways, narrow_lanes, wide_multi_lane",
+    "tire_friction": 1.0,
+    "gear_ratio": 6.0,
+    "predicted_speed_ms": 25.411910169779194,
+    "predicted_time": 36.61800828367169,
+    "profile_summary": "Route Type: straight_speed, Length: 930.5m"
+  },
+  {
+    "selected_flags": "tight_curves, long_straightaways, narrow_lanes, wide_multi_lane",
+    "tire_friction": 1.0,
+    "gear_ratio": 6.0,
+    "predicted_speed_ms": 25.487434144339716,
+    "predicted_time": 36.44393800979809,
+    "profile_summary": "Route Type: straight_speed, Length: 928.9m"
+  },
+  {
+    "selected_flags": "intersections_90, steep_elevation, high_speed_sections, tight_curves, long_straightaways",
+    "tire_friction": 0.5,
+    "gear_ratio": 6.0,
+    "predicted_speed_ms": 24.883905598287875,
+    "predicted_time": 36.76944719207459,
+    "profile_summary": "Route Type: elevation, Length: 915.0m"
+  },
+  {
+    "selected_flags": "intersections_90, steep_elevation, high_speed_sections, tight_curves, narrow_lanes",
+    "tire_friction": 0.5,
+    "gear_ratio": 6.0,
+    "predicted_speed_ms": 13.230892506828193,
+    "predicted_time": 67.2643551725268,
+    "profile_summary": "Route Type: elevation, Length: 890.0m"
+  },
+  {
+    "selected_flags": "intersections_90, steep_elevation, high_speed_sections, tight_curves, wide_multi_lane",
+    "tire_friction": 0.5,
+    "gear_ratio": 6.0,
+    "predicted_speed_ms": 15.279608665645709,
+    "predicted_time": 58.245434965215814,
+    "profile_summary": "Route Type: elevation, Length: 890.0m"
+  },
+  {
+    "selected_flags": "intersections_90, steep_elevation, high_speed_sections, long_straightaways, narrow_lanes",
+    "tire_friction": 3.0,
+    "gear_ratio": 6.0,
+    "predicted_speed_ms": 24.457042315621536,
+    "predicted_time": 37.41120618842756,
+    "profile_summary": "Route Type: elevation, Length: 915.0m"
+  },
+  {
+    "selected_flags": "intersections_90, steep_elevation, high_speed_sections, long_straightaways, wide_multi_lane",
+    "tire_friction": 0.5,
+    "gear_ratio": 6.0,
+    "predicted_speed_ms": 25.87601819243067,
+    "predicted_time": 35.35966956061517,
+    "profile_summary": "Route Type: elevation, Length: 915.0m"
+  },
+  {
+    "selected_flags": "intersections_90, steep_elevation, high_speed_sections, narrow_lanes, wide_multi_lane",
+    "tire_friction": 3.0,
+    "gear_ratio": 6.0,
+    "predicted_speed_ms": 23.275157925213744,
+    "predicted_time": 38.236795457560454,
+    "profile_summary": "Route Type: elevation, Length: 890.0m"
+  },
+  {
+    "selected_flags": "intersections_90, steep_elevation, tight_curves, long_straightaways, narrow_lanes",
+    "tire_friction": 3.0,
+    "gear_ratio": 6.0,
+    "predicted_speed_ms": 24.618107253849367,
+    "predicted_time": 36.557134289359034,
+    "profile_summary": "Route Type: elevation, Length: 900.0m"
+  },
+  {
+    "selected_flags": "intersections_90, steep_elevation, tight_curves, long_straightaways, wide_multi_lane",
+    "tire_friction": 0.5,
+    "gear_ratio": 6.0,
+    "predicted_speed_ms": 25.985060525399142,
+    "predicted_time": 34.634033349629505,
+    "profile_summary": "Route Type: elevation, Length: 900.0m"
+  },
+  {
+    "selected_flags": "intersections_90, steep_elevation, tight_curves, narrow_lanes, wide_multi_lane",
+    "tire_friction": 0.5,
+    "gear_ratio": 6.0,
+    "predicted_speed_ms": 15.187149611116668,
+    "predicted_time": 57.61235486798376,
+    "profile_summary": "Route Type: elevation, Length: 875.0m"
+  },
+  {
+    "selected_flags": "intersections_90, steep_elevation, long_straightaways, narrow_lanes, wide_multi_lane",
+    "tire_friction": 0.5,
+    "gear_ratio": 6.0,
+    "predicted_speed_ms": 25.45950058935086,
+    "predicted_time": 35.3489829727945,
+    "profile_summary": "Route Type: elevation, Length: 900.0m"
+  },
+  {
+    "selected_flags": "intersections_90, high_speed_sections, tight_curves, long_straightaways, narrow_lanes",
+    "tire_friction": 1.0,
+    "gear_ratio": 6.0,
+    "predicted_speed_ms": 24.09731259607316,
+    "predicted_time": 38.61565613970302,
+    "profile_summary": "Route Type: straight_speed, Length: 930.5m"
+  },
+  {
+    "selected_flags": "intersections_90, high_speed_sections, tight_curves, long_straightaways, wide_multi_lane",
+    "tire_friction": 1.0,
+    "gear_ratio": 6.0,
+    "predicted_speed_ms": 26.028691251847732,
+    "predicted_time": 35.750300623925476,
+    "profile_summary": "Route Type: straight_speed, Length: 930.5m"
+  },
+  {
+    "selected_flags": "intersections_90, high_speed_sections, tight_curves, narrow_lanes, wide_multi_lane",
+    "tire_friction": 2.0,
+    "gear_ratio": 6.0,
+    "predicted_speed_ms": 10.09384832842379,
+    "predicted_time": 91.03192757490275,
+    "profile_summary": "Route Type: straight_speed, Length: 918.9m"
+  },
+  {
+    "selected_flags": "intersections_90, high_speed_sections, long_straightaways, narrow_lanes, wide_multi_lane",
+    "tire_friction": 1.0,
+    "gear_ratio": 6.0,
+    "predicted_speed_ms": 25.411910169779194,
+    "predicted_time": 36.61800828367169,
+    "profile_summary": "Route Type: straight_speed, Length: 930.5m"
+  },
+  {
+    "selected_flags": "intersections_90, tight_curves, long_straightaways, narrow_lanes, wide_multi_lane",
+    "tire_friction": 1.0,
+    "gear_ratio": 6.0,
+    "predicted_speed_ms": 25.487434144339716,
+    "predicted_time": 36.44393800979809,
+    "profile_summary": "Route Type: straight_speed, Length: 928.9m"
+  },
+  {
+    "selected_flags": "steep_elevation, high_speed_sections, tight_curves, long_straightaways, narrow_lanes",
+    "tire_friction": 3.0,
+    "gear_ratio": 6.0,
+    "predicted_speed_ms": 24.457042315621536,
+    "predicted_time": 37.41120618842756,
+    "profile_summary": "Route Type: elevation, Length: 915.0m"
+  },
+  {
+    "selected_flags": "steep_elevation, high_speed_sections, tight_curves, long_straightaways, wide_multi_lane",
+    "tire_friction": 0.5,
+    "gear_ratio": 6.0,
+    "predicted_speed_ms": 25.87601819243067,
+    "predicted_time": 35.35966956061517,
+    "profile_summary": "Route Type: elevation, Length: 915.0m"
+  },
+  {
+    "selected_flags": "steep_elevation, high_speed_sections, tight_curves, narrow_lanes, wide_multi_lane",
+    "tire_friction": 0.5,
+    "gear_ratio": 6.0,
+    "predicted_speed_ms": 14.66373680160622,
+    "predicted_time": 60.69172304915694,
+    "profile_summary": "Route Type: elevation, Length: 890.0m"
+  },
+  {
+    "selected_flags": "steep_elevation, high_speed_sections, long_straightaways, narrow_lanes, wide_multi_lane",
+    "tire_friction": 0.5,
+    "gear_ratio": 6.0,
+    "predicted_speed_ms": 25.412266740254978,
+    "predicted_time": 36.00495233978622,
+    "profile_summary": "Route Type: elevation, Length: 915.0m"
+  },
+  {
+    "selected_flags": "steep_elevation, tight_curves, long_straightaways, narrow_lanes, wide_multi_lane",
+    "tire_friction": 0.5,
+    "gear_ratio": 6.0,
+    "predicted_speed_ms": 25.45950058935086,
+    "predicted_time": 35.3489829727945,
+    "profile_summary": "Route Type: elevation, Length: 900.0m"
+  },
+  {
+    "selected_flags": "high_speed_sections, tight_curves, long_straightaways, narrow_lanes, wide_multi_lane",
+    "tire_friction": 1.0,
+    "gear_ratio": 6.0,
+    "predicted_speed_ms": 25.411910169779194,
+    "predicted_time": 36.61800828367169,
+    "profile_summary": "Route Type: straight_speed, Length: 930.5m"
+  },
+  {
+    "selected_flags": "intersections_90, steep_elevation, high_speed_sections, tight_curves, long_straightaways, narrow_lanes",
+    "tire_friction": 3.0,
+    "gear_ratio": 6.0,
+    "predicted_speed_ms": 24.457042315621536,
+    "predicted_time": 37.41120618842756,
+    "profile_summary": "Route Type: elevation, Length: 915.0m"
+  },
+  {
+    "selected_flags": "intersections_90, steep_elevation, high_speed_sections, tight_curves, long_straightaways, wide_multi_lane",
+    "tire_friction": 0.5,
+    "gear_ratio": 6.0,
+    "predicted_speed_ms": 25.87601819243067,
+    "predicted_time": 35.35966956061517,
+    "profile_summary": "Route Type: elevation, Length: 915.0m"
+  },
+  {
+    "selected_flags": "intersections_90, steep_elevation, high_speed_sections, tight_curves, narrow_lanes, wide_multi_lane",
+    "tire_friction": 0.5,
+    "gear_ratio": 6.0,
+    "predicted_speed_ms": 14.66373680160622,
+    "predicted_time": 60.69172304915694,
+    "profile_summary": "Route Type: elevation, Length: 890.0m"
+  },
+  {
+    "selected_flags": "intersections_90, steep_elevation, high_speed_sections, long_straightaways, narrow_lanes, wide_multi_lane",
+    "tire_friction": 0.5,
+    "gear_ratio": 6.0,
+    "predicted_speed_ms": 25.412266740254978,
+    "predicted_time": 36.00495233978622,
+    "profile_summary": "Route Type: elevation, Length: 915.0m"
+  },
+  {
+    "selected_flags": "intersections_90, steep_elevation, tight_curves, long_straightaways, narrow_lanes, wide_multi_lane",
+    "tire_friction": 0.5,
+    "gear_ratio": 6.0,
+    "predicted_speed_ms": 25.45950058935086,
+    "predicted_time": 35.3489829727945,
+    "profile_summary": "Route Type: elevation, Length: 900.0m"
+  },
+  {
+    "selected_flags": "intersections_90, high_speed_sections, tight_curves, long_straightaways, narrow_lanes, wide_multi_lane",
+    "tire_friction": 1.0,
+    "gear_ratio": 6.0,
+    "predicted_speed_ms": 25.411910169779194,
+    "predicted_time": 36.61800828367169,
+    "profile_summary": "Route Type: straight_speed, Length: 930.5m"
+  },
+  {
+    "selected_flags": "steep_elevation, high_speed_sections, tight_curves, long_straightaways, narrow_lanes, wide_multi_lane",
+    "tire_friction": 0.5,
+    "gear_ratio": 6.0,
+    "predicted_speed_ms": 25.412266740254978,
+    "predicted_time": 36.00495233978622,
+    "profile_summary": "Route Type: elevation, Length: 915.0m"
+  },
+  {
+    "selected_flags": "intersections_90, steep_elevation, high_speed_sections, tight_curves, long_straightaways, narrow_lanes, wide_multi_lane",
+    "tire_friction": 0.5,
+    "gear_ratio": 6.0,
+    "predicted_speed_ms": 25.412266740254978,
+    "predicted_time": 36.00495233978622,
+    "profile_summary": "Route Type: elevation, Length: 915.0m"
+  }
+]
