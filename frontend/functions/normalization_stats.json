@@ -1,0 +1,119 @@
+{
+  "numeric_features_input": [
+    "total_length",
+    "avg_curvature",
+    "max_curvature",
+    "std_curvature",
+    "tight_corners_pct",
+    "straight_pct",
+    "avg_slope",
+    "max_slope",
+    "elevation_range",
+    "max_elevation",
+    "min_elevation",
+    "gear_ratio",
+    "tire_friction"
+  ],
+  "target_col": "avg_speed_ms",
+  "numeric_to_normalize": [
+    "total_length",
+    "avg_curvature",
+    "max_curvature",
+    "std_curvature",
+    "tight_corners_pct",
+    "straight_pct",
+    "avg_slope",
+    "max_slope",
+    "elevation_range",
+    "max_elevation",
+    "min_elevation",
+    "gear_ratio",
+    "tire_friction",
+    "avg_speed_ms"
+  ],
+  "feature_cols": [
+    "total_length",
+    "avg_curvature",
+    "max_curvature",
+    "std_curvature",
+    "tight_corners_pct",
+    "straight_pct",
+    "avg_slope",
+    "max_slope",
+    "elevation_range",
+    "max_elevation",
+    "min_elevation",
+    "gear_ratio",
+    "tire_friction",
+    "rt_elevation",
+    "rt_mixed",
+    "rt_straight_speed",
+    "rt_tight_curves",
+    "rt_tire_friction_test"
+  ],
+  "route_types": [
+    "elevation",
+    "mixed",
+    "straight_speed",
+    "tight_curves",
+    "tire_friction_test"
+  ],
+  "stats": {
+    "total_length": {
+      "mean": 899.5652844306563,
+      "std": 25.769201905945803
+    },
+    "avg_curvature": {
+      "mean": 0.009049730296084081,
+      "std": 0.005100677300346778
+    },
+    "max_curvature": {
+      "mean": 0.029016741696798003,
+      "std": 0.012373789743633025
+    },
+    "std_curvature": {
+      "mean": 0.010466497142986421,
+      "std": 0.0052009917860758505
+    },
+    "tight_corners_pct": {
+      "mean": 0.22083333333333285,
+      "std": 0.18535813682945992
+    },
+    "straight_pct": {
+      "mean": 0.6000000000000016,
+      "std": 0.17911821050170595
+    },
+    "avg_slope": {
+      "mean": 0.003983317488271119,
+      "std": 0.005549738134226293
+    },
+    "max_slope": {
+      "mean": 0.01893418396172448,
+      "std": 0.026026022769935105
+    },
+    "elevation_range": {
+      "mean": 3.6829910278320312,
+      "std": 5.174177059151685
+    },
+    "max_elevation": {
+      "mean": 3.6829910278320312,
+      "std": 5.174177059151685
+    },
+    "min_elevation": {
+      "mean": 0.0,
+      "std": 1.0
+    },
+    "gear_ratio": {
+      "mean": 3.5,
+      "std": 1.695582495781317
+    },
+    "tire_friction": {
+      "mean": 1.625,
+      "std": 0.960143218483576
+    },
+    "avg_speed_ms": {
+      "mean": 13.651556296359914,
+      "std": 6.154588365717044
+    }
+  }
+}
